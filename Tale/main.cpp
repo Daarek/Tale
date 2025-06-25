@@ -1,17 +1,19 @@
-
-
 #include "SDL.h"
 #define	SDL_MAIN_USE_CALLBACKS
 #include "SDL3/SDL_main.h"
 #include "enums.h"
 #include "drawTools.h"
+#include "localMap.h"
+#include "temporary.h"
 
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
-
+LocalMap* map = new LocalMap;
 
 
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv) {
+	
+	map->tileMap = generateRandom();//!!!
 
 	SDL_Init(SDL_INIT_VIDEO);
 	window = SDL_CreateWindow("main", 1920, 1080, NULL);
@@ -21,7 +23,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv) {
 };
 
 SDL_AppResult SDL_AppIterate(void* appstate) {
-	drawFrame();
+	drawFrame(map->tileMap, 0); //!!!
 	SDL_RenderPresent(renderer);
 	SDL_Delay(2000);
 	return SDL_APP_CONTINUE;

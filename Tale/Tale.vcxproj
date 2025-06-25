@@ -129,13 +129,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="localMap.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="drawTools.cpp" />
+    <ClCompile Include="temporary.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="drawTools.h" />
     <ClInclude Include="enums.h" />
+    <ClInclude Include="localMap.h" />
     <ClInclude Include="SDL.h" />
+    <ClInclude Include="templates.h" />
+    <ClInclude Include="temporary.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

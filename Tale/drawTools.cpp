@@ -1,6 +1,6 @@
 #include "SDL.h"
 #include "enums.h"
-
+#include "templates.h"
 
 static SDL_Renderer* renderer = NULL;//renderer
 
@@ -38,16 +38,10 @@ void drawTile(Tile tile, int x, int y) { //нарисовать тайл
 	SDL_RenderTexture(renderer, betaTileset, &i, &pos); //рисует
 };
 
-void drawFrame() { //потом всё перекопать, это тест
-	for (int x = 0; x < scale; x++) {
-		for (int y = 0; y < scale; y++) {
-			int r = SDL_rand(2);
-			if (r == 1) {
-				drawTile(GRASS, x, y);
-			}
-			else {
-				drawTile(STONE, x, y);
-			}
-		};
-	};
+void drawFrame(const arr3d<Tile, 64, 64, 256> *arr, int z) { //потом всё перекопать, это тест
+	for (int x = 0; x < 64; x++) {
+		for (int y = 0; y < 64; y++) {
+			drawTile((*arr)[z][x][y], x, y);
+		}
+	}
 }
