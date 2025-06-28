@@ -9,17 +9,22 @@ static SDL_Texture* betaTileset = NULL;//тестовый тайлсет     ===> заменить все 
 static SDL_Texture* rat16 = NULL; //мыш
 
 static int scale = 64; //в будущем зум сделать кастомизируемым
+static int screenWidth;
+static int screenHeight;
 
 static SDL_FRect cut(int x, int y) { //функция, находит нужный квадратик тайлсета по его координатам на пнгшке
 	return { (float)(16 * x), (float)(16 * y), 16.f, 16.f };
 };
 
-void drawToolsInit(SDL_Renderer* rend) { //функция, чтобы передать всё нужное из main сюда
+void drawToolsInit(SDL_Renderer* rend, int w, int h) { //функция, чтобы передать всё нужное из main сюда
 	renderer = rend;
 	
 	placeholder = IMG_LoadTexture(renderer, "Assets/coconut.png"); //инициализирую текстуры
 	betaTileset = IMG_LoadTexture(renderer, "Assets/ts_simple.png");
 	rat16 = IMG_LoadTexture(renderer, "Assets/rat.png");
+
+	screenWidth = w;
+	screenHeight = h;
 };
 
 void drawTile(Tile tile, int x, int y) { //нарисовать тайл
@@ -38,10 +43,21 @@ void drawTile(Tile tile, int x, int y) { //нарисовать тайл
 	SDL_RenderTexture(renderer, betaTileset, &i, &pos); //рисует
 };
 
-void drawFrame(const arr3d<Tile, 64, 64, 256> *arr, int z) { //потом всё перекопать, это тест
+void drawFrame(const arr3d<Tile, 64, 64, 256>* arr, int z) { //потом всё перекопать, это тест
 	for (int x = 0; x < 64; x++) {
 		for (int y = 0; y < 64; y++) {
 			drawTile((*arr)[z][x][y], x, y);
-		}
-	}
-}
+		};
+	};
+};
+
+void drawMainMenu() { //рисует главное меню
+
+	//рисует кнопку старт, переделать потом с текстурами
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	SDL_RenderLine(renderer, (screenWidth / 2 - screenWidth / 20), (screenHeight / 2 - screenHeight / 20), (screenWidth / 2 + screenWidth / 20), (screenHeight / 2 - screenHeight / 20));
+	SDL_RenderLine(renderer, (screenWidth / 2 - screenWidth / 20), (screenHeight / 2 + screenHeight / 20), (screenWidth / 2 + screenWidth / 20), (screenHeight / 2 + screenHeight / 20));
+	SDL_RenderLine(renderer, (screenWidth / 2 - screenWidth / 20), (screenHeight / 2 - screenHeight / 20), (screenWidth / 2 - screenWidth / 20), (screenHeight / 2 + screenHeight / 20));
+	SDL_RenderLine(renderer, (screenWidth / 2 + screenWidth / 20), (screenHeight / 2 - screenHeight / 20), (screenWidth / 2 + screenWidth / 20), (screenHeight / 2 + screenHeight / 20));
+	
+};
