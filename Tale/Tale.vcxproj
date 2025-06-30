@@ -129,6 +129,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="inputHandler.cpp" />
     <ClCompile Include="localMap.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="drawTools.cpp" />
@@ -137,6 +138,7 @@
   <ItemGroup>
     <ClInclude Include="drawTools.h" />
     <ClInclude Include="enums.h" />
+    <ClInclude Include="inputHandler.h" />
     <ClInclude Include="localMap.h" />
     <ClInclude Include="SDL.h" />
     <ClInclude Include="templates.h" />

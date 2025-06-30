@@ -4,11 +4,11 @@
 
 static SDL_Renderer* renderer = NULL;//renderer
 
-static SDL_Texture* placeholder = NULL;//текстура пустышка
+static SDL_Texture* placeholder = NULL;//текстура заполнитель
 static SDL_Texture* betaTileset = NULL;//тестовый тайлсет     ===> заменить все на 32х32 когда нибудь
 static SDL_Texture* rat16 = NULL; //мыш
 
-static int scale = 64; //в будущем зум сделать кастомизируемым
+static int scale = 64; //в будущем зум сделать кастомизируемым, сколько тайлов помещается на экран
 static int screenWidth;
 static int screenHeight;
 
@@ -43,7 +43,7 @@ void drawTile(Tile tile, int x, int y) { //нарисовать тайл
 	SDL_RenderTexture(renderer, betaTileset, &i, &pos); //рисует
 };
 
-void drawFrame(const arr3d<Tile, 64, 64, 256>* arr, int z) { //потом всё перекопать, это тест
+void drawFrame(const arr3d<Tile, 64, 64, 256>* arr, int z) { //потом всё перекопать, это тест, рисует GAME_SCREEN
 	for (int x = 0; x < 64; x++) {
 		for (int y = 0; y < 64; y++) {
 			drawTile((*arr)[z][x][y], x, y);
