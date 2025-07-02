@@ -1,6 +1,7 @@
 #pragma once
 
 enum Tile {
+	AIR,
 	GRASS,
 	STONE
 };

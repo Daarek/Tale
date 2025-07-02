@@ -13,14 +13,14 @@ static int screenWidth;
 static int screenHeight;
 
 static SDL_FRect cut(int x, int y) { //функция, находит нужный квадратик тайлсета по его координатам на пнгшке
-	return { (float)(16 * x), (float)(16 * y), 16.f, 16.f };
+	return { (float)(32 * x), (float)(32 * y), 32.f, 32.f };
 };
 
 void drawToolsInit(SDL_Renderer* rend, int w, int h) { //функция, чтобы передать всё нужное из main сюда
 	renderer = rend;
 	
 	placeholder = IMG_LoadTexture(renderer, "Assets/coconut.png"); //инициализирую текстуры
-	betaTileset = IMG_LoadTexture(renderer, "Assets/ts_simple.png");
+	betaTileset = IMG_LoadTexture(renderer, "Assets/ts_simple32.png");
 	rat16 = IMG_LoadTexture(renderer, "Assets/rat.png");
 
 	screenWidth = w;
@@ -32,11 +32,13 @@ void drawTile(Tile tile, int x, int y) { //нарисовать тайл
 	int side = (int)(1024 / scale); //длинна стороны тайла в пикселях
 	SDL_FRect pos = { x*side, y*side, side, side }; //место, куда на экране нарисовать тайл
 	switch (tile) { //выбирает тайл для рисовки и срезает его с тайлсета
-	case GRASS:
-		i = cut(1, 0);
+	case AIR:
 		break;
-	case STONE:
-		i = cut(2, 0);
+	case GRASS:
+		i = cut(0, 0);
+		break;
+	case STONE: //текстура говна, не камня
+		i = cut(1, 0);
 		break;
 
 	};

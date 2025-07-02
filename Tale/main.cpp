@@ -8,6 +8,7 @@
 #include <string>
 #include <iostream>
 #include "inputHandler.h"
+#include "generators.h"
 
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
@@ -15,10 +16,11 @@ static LocalMap* map = new LocalMap; //локальная карта, переместить потом
 static Screen screen = MAIN_MENU; //текущий экран
 static int screenWidth = 1920;
 static int screenHeight = 1080;
+static int seed;
 
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv) {
-	
-	map->tileMap = generateRandom();//!!!
+	seed = generateSeed();
+	map->tileMap = generateOnHeightMap(seed);//!!!
 	map->viewedZLevel = 128;
 	inputHandlerInit(map, screenWidth, screenHeight); //инициализация инпут функций
 	SDL_Init(SDL_INIT_VIDEO); //инициализация всего
@@ -30,6 +32,8 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv) {
 };
 
 SDL_AppResult SDL_AppIterate(void* appstate) {
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	SDL_RenderClear(renderer);
 	switch (screen) {  //определяет, какой "экран" рисовать
 	case MAIN_MENU:
 		drawMainMenu();
