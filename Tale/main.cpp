@@ -32,6 +32,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv) {
 };
 
 SDL_AppResult SDL_AppIterate(void* appstate) {
+	
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
 	switch (screen) {  //определяет, какой "экран" рисовать
@@ -42,7 +43,7 @@ SDL_AppResult SDL_AppIterate(void* appstate) {
 		drawFrame(map->tileMap, map->viewedZLevel); //!!!
 		break;
 	};
-
+	
 	SDL_RenderPresent(renderer); //закончить прорисовку
 	return SDL_APP_CONTINUE;
 };

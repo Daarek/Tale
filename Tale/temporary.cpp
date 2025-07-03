@@ -2,6 +2,7 @@
 #include "templates.h"
 #include "SDL.h"
 #include "generators.h"
+#include <iostream>
 arr3d<Tile, 64, 64, 256>* generateRandom(){
 	arr3d<Tile, 64, 64, 256>* result = new arr3d<Tile, 64, 64, 256>;
 	for (int z = 0; z < 256; z++) {

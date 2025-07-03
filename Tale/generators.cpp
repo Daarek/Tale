@@ -27,13 +27,15 @@ static float interpolate(float x1, float y1, float x2, float y2, float x3, float
     float d1 = pow((pow(a1, 2) + pow(b1, 2)), 0.5);
     float d2 = pow((pow(a2, 2) + pow(b2, 2)), 0.5);
     float amp = abs(weight1 - weight2);
-    float relx = d1 / (d1 + d2);
+    float relx;
     float grand;
     if (weight1 > weight2) {
         grand = weight2;
+        relx = d2 / (d1 + d2);
     }
     else {
         grand = weight1;
+        relx = d1 / (d1 + d2);
     }
     return amp * smoothStep(relx) + grand;
 }
@@ -41,7 +43,7 @@ static float interpolate(float x1, float y1, float x2, float y2, float x3, float
 float getNoiseValue(double x, double y, float* vectors, int size) {//найти значение шума в точке на сетке перлина
     int xl = floor(x); //x двух левых векторов
     int yb = floor(y); //y двух нижних векторов
-    
+
     if ((xl != x) and (yb != y)) { //если точка не находится между клетками
         int yt = yb + 1; //y двух верхних векторов
         int xr = xl + 1; //x двух правых векторов
