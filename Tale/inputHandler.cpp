@@ -1,6 +1,9 @@
 #include "SDL.h"
 #include "enums.h"
 #include "localMap.h"
+#include "saveFileHandler.h"
+#include "temporary.h"
+#include <iostream>
 
 static int windowWidth;
 static int windowHeight;
@@ -16,8 +19,9 @@ void mouseInput(SDL_Event* event, Screen &screen) {
 	int x = event->button.x;
 	int y = event->button.y;
 
-	//нажатие кнопки старт пускает сразу на экран игры
+	//нажатие кнопки старт пускает сразу на экран игры, создаёт новый мир
 	if ((x > 0.45 * windowWidth) and (x < 0.55 * windowWidth) and (y > 0.45 * windowHeight) and (y < 0.55 * windowHeight)) {
+		map->tileMap = generateOnHeightMap(map->seed);//!!!
 		screen = GAME_SCREEN;
 	}
 }
@@ -37,6 +41,11 @@ void keyboardInput(SDL_Event* event, Screen &screen) {
 	}
 
 	case MAIN_MENU: {
+		SDL_Keycode key = event->key.key;
+		if (key == SDLK_L) {
+			map->tileMap = generateOnHeightMap(load());//сгенерировать карту по имеющемуся сиду
+			screen = GAME_SCREEN;
+		}
 		break;
 	}
 

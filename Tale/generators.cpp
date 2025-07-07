@@ -1,8 +1,9 @@
 #include "templates.h"
 #include <iostream>
-//#include<cstdlib>
-#include<ctime>
-#include<cmath>
+#include <cstdlib>
+#include <ctime>
+#include <cmath>
+#include <random>
 //using namespace std;
 static float M_PI = 3.14159265;
 static float rad = (M_PI / 180);
@@ -40,14 +41,14 @@ static float interpolate(float x1, float y1, float x2, float y2, float x3, float
     return amp * smoothStep(relx) + grand;
 }
 
-float getNoiseValue(double x, double y, float* vectors, int size) {//найти значение шума в точке на сетке перлина
+float getNoiseValue(float x, float y, float* vectors, int size) {//найти значение шума в точке на сетке перлина
     int xl = floor(x); //x двух левых векторов
     int yb = floor(y); //y двух нижних векторов
 
     if ((xl != x) and (yb != y)) { //если точка не находится между клетками
         int yt = yb + 1; //y двух верхних векторов
         int xr = xl + 1; //x двух правых векторов
-        
+
         float vbl = vectors[xl + (size + 1) * yb]; //вектор нижнего левого угла
         float vtl = vectors[xl + (size + 1) * yt]; //вектор верхнего левого угла
         float vtr = vectors[xr + (size + 1) * yt]; //вектор верхнего правого угла
@@ -91,10 +92,12 @@ float getNoiseValue(double x, double y, float* vectors, int size) {//найти значе
 
 float* createGrid(int seed, int size) {//size - количество клеток
     int lenght = (size + 1) * (size + 1);
-    float* vectors = new float[lenght]; //не забудь очистить
-    srand(seed);
+    float* vectors = new float[lenght]; //не забыть отчистить
+    std::mt19937 rng(seed);
+    std::uniform_int_distribution<int> dist(1, 3600);
     for (int i = 0; i < lenght; i++) {
-        vectors[i] = rand() % 361;
+        vectors[i] = dist(rng)/10;
+        
     }
     return vectors;
 }
@@ -104,7 +107,6 @@ arr2d<float, 64, 64>* createHeightMap(int order, int startScale, int seed) {//or
         std::cout << "error";
         return nullptr;
     }
-    srand(seed);
     int t = 0;
     for (int i = 0; i < order; i++) {
         t = t + pow(2, i);
@@ -115,11 +117,11 @@ arr2d<float, 64, 64>* createHeightMap(int order, int startScale, int seed) {//or
     for (int i = 1; i <= order; i++) { //создавать карту по октаве
 
         float* stack_grid = createGrid(seed, pow(startScale, i));//текущая октава
-        float step = (pow(startScale, i)+1) / 64; //скольки координатам на октаве соответствует координата на arr2d
+        float step = pow(startScale, i) / 64; //скольки координатам на октаве соответствует координата на arr2d
 
         for (int x = 0; x < 64; x++) {
             for (int y = 0; y < 64; y++) {
-                (*heightMap)[x][y] += (getNoiseValue(x * step, y * step, stack_grid, pow(startScale, i))/pow(startScale, i - 1)); //ищем значения по 1
+                (*heightMap)[x][y] += (getNoiseValue(x * step, y * step, stack_grid, pow(startScale, i)) /pow(startScale, i - 1)); //ищем значения по 1
             }
          }
 

@@ -29,8 +29,9 @@ arr3d<Tile, 64, 64, 256>* generateOnHeightMap(int seed) {
 		for (int y = 0; y < 64; y++) {
 			int h = (floor((*height)[x][y] * 10) + 128);//высота в этом месте
 			for (int z = 0; z < h; z++) {
-				(*result)[z][x][y] = GRASS;//заполняю
+				(*result)[z][x][y] = STONE;//заполняю
 			}
+			(*result)[h][x][y] = GRASS;//верхний слой травы
 		}
 	}
 	delete(height);//почистить

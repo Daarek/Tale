@@ -9,6 +9,7 @@
 #include <iostream>
 #include "inputHandler.h"
 #include "generators.h"
+#include "saveFileHandler.h"
 
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
@@ -16,18 +17,15 @@ static LocalMap* map = new LocalMap; //локальная карта, переместить потом
 static Screen screen = MAIN_MENU; //текущий экран
 static int screenWidth = 1920;
 static int screenHeight = 1080;
-static int seed;
 
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv) {
-	seed = generateSeed();
-	map->tileMap = generateOnHeightMap(seed);//!!!
+	map->seed = generateSeed();
 	map->viewedZLevel = 128;
 	inputHandlerInit(map, screenWidth, screenHeight); //инициализация инпут функций
 	SDL_Init(SDL_INIT_VIDEO); //инициализация всего
 	window = SDL_CreateWindow("main", screenWidth, screenHeight, NULL);
 	renderer = SDL_CreateRenderer(window, NULL);
 	drawToolsInit(renderer, screenWidth, screenHeight);//запихиваю важные переменные в drawTools
-
 	return SDL_APP_CONTINUE;
 };
 
@@ -52,6 +50,7 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) { //ивенты
 	switch (event->type) {
 
 	case SDL_EVENT_QUIT: {//выход из приложения
+		save(map->seed);
 		return SDL_APP_SUCCESS;
 		break;
 	}
