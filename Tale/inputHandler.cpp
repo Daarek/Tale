@@ -3,6 +3,7 @@
 #include "localMap.h"
 #include "saveFileHandler.h"
 #include "temporary.h"
+#include "generators.h"
 #include <iostream>
 
 static int windowWidth;
@@ -21,6 +22,7 @@ void mouseInput(SDL_Event* event, Screen &screen) {
 
 	//нажатие кнопки старт пускает сразу на экран игры, создаёт новый мир
 	if ((x > 0.45 * windowWidth) and (x < 0.55 * windowWidth) and (y > 0.45 * windowHeight) and (y < 0.55 * windowHeight)) {
+		map->seed = generateSeed();
 		map->tileMap = generateOnHeightMap(map->seed);//!!!
 		screen = GAME_SCREEN;
 	}
@@ -37,13 +39,18 @@ void keyboardInput(SDL_Event* event, Screen &screen) {
 		else if (key == SDLK_F) {// посмотреть на уровень вниз
 			map->viewedZLevel--;
 		}
+		else if (key == SDLK_Q) {//перезагрузить мир, убрать потом
+			map->tileMap = generateOnHeightMap(map->seed);
+			map->viewedZLevel = 128;
+		}
 		break;
 	}
 
 	case MAIN_MENU: {
 		SDL_Keycode key = event->key.key;
 		if (key == SDLK_L) {
-			map->tileMap = generateOnHeightMap(load());//сгенерировать карту по имеющемуся сиду
+			map->seed = load();
+			map->tileMap = generateOnHeightMap(map->seed);//сгенерировать карту по имеющемуся сиду
 			screen = GAME_SCREEN;
 		}
 		break;

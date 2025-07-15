@@ -19,7 +19,6 @@ static int screenWidth = 1920;
 static int screenHeight = 1080;
 
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv) {
-	map->seed = generateSeed();
 	map->viewedZLevel = 128;
 	inputHandlerInit(map, screenWidth, screenHeight); //инициализация инпут функций
 	SDL_Init(SDL_INIT_VIDEO); //инициализация всего

@@ -102,8 +102,8 @@ float* createGrid(int seed, int size) {//size - количество клеток
     return vectors;
 }
 
-arr2d<float, 64, 64>* createHeightMap(int order, int startScale, int seed) {//order - количество октав, startScale - колво кубиков на первой октаве
-    if ((startScale * pow(2, order)) > 64) { //вернёт ничего если одна из октав шума будет детализированее всей карты
+arr2d<float, 256, 256>* createHeightMap(int order, int startScale, int seed) {//order - количество октав, startScale - колво кубиков на первой октаве
+    if ((startScale * pow(2, order)) > 256) { //вернёт ничего если одна из октав шума будет детализированее всей карты
         std::cout << "error";
         return nullptr;
     }
@@ -112,24 +112,24 @@ arr2d<float, 64, 64>* createHeightMap(int order, int startScale, int seed) {//or
         t = t + pow(2, i);
     }
     int low = (t / pow(2, (order - 1))); //число, на которое стоит поделить все высоты после создания полной сетки со всеми слоями
-    arr2d<float, 64, 64>* heightMap = new arr2d<float, 64, 64>{}; //указатель на карту высот
+    arr2d<float, 256, 256>* heightMap = new arr2d<float, 256, 256>{}; //указатель на карту высот
 
     for (int i = 1; i <= order; i++) { //создавать карту по октаве
 
         float* stack_grid = createGrid(seed, pow(startScale, i));//текущая октава
-        float step = pow(startScale, i) / 64; //скольки координатам на октаве соответствует координата на arr2d
+        float step = pow(startScale, i) / 256; //скольки координатам на октаве соответствует координата на arr2d
 
-        for (int x = 0; x < 64; x++) {
-            for (int y = 0; y < 64; y++) {
-                (*heightMap)[x][y] += (getNoiseValue(x * step, y * step, stack_grid, pow(startScale, i)) /pow(startScale, i - 1)); //ищем значения по 1
+        for (int x = 0; x < 256; x++) {
+            for (int y = 0; y < 256; y++) {
+                (*heightMap)[x][y] += (getNoiseValue(x * step, y * step, stack_grid, pow(startScale, i)) /pow(2, i - 1)); //ищем значения по 1
             }
          }
 
         delete(stack_grid);//почистить память
     }
     
-    for (int x = 0; x < 64; x++) { // сжать
-        for (int y = 0; y < 64; y++) {
+    for (int x = 0; x < 256; x++) { // сжать
+        for (int y = 0; y < 256; y++) {
             (*heightMap)[x][y] /= low;
         }
     }

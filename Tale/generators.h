@@ -1,7 +1,8 @@
 #pragma once
 #include "templates.h"
 
-arr2d<float, 64, 64>* createHeightMap(int order, int startScale, int seed);
+arr2d<float, 256, 256>* createHeightMap(int order, int startScale, int seed);
+
 int generateSeed();
 /*
 float* createGrid(int seed, int size);
