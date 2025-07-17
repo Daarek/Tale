@@ -4,4 +4,4 @@
 
 void mouseInput(SDL_Event* event, Screen& screen);
 void keyboardInput(SDL_Event* event, Screen& screen);
-void inputHandlerInit(LocalMap* m, int w, int h);
+void inputHandlerInit(GlobalMap* m, int w, int h);

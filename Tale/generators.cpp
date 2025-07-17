@@ -4,15 +4,24 @@
 #include <ctime>
 #include <cmath>
 #include <random>
+#include "localMap.h"
+#include "enums.h"
 //using namespace std;
 static float M_PI = 3.14159265;
 static float rad = (M_PI / 180);
+
+static GlobalMap* map;
+
 int generateSeed() {
 
     srand(time(0));
 
     return rand();
 
+}
+
+void generatorsInit(GlobalMap* m) {
+    map = m;
 }
 
 static float smoothStep(float t) {
@@ -96,10 +105,81 @@ float* createGrid(int seed, int size) {//size - количество клеток
     std::mt19937 rng(seed);
     std::uniform_int_distribution<int> dist(1, 3600);
     for (int i = 0; i < lenght; i++) {
-        vectors[i] = dist(rng)/10;
-        
+        vectors[i] = dist(rng) / 10;
+
     }
     return vectors;
+}
+
+void firstGeneratingSequence() {
+
+    int perlinArrayLenght = 0;
+
+    for (int i = 0; i < map->octaveAmount; i++) {
+        perlinArrayLenght += (int)pow((pow(2, i) * map->initSize + 1), 2);
+    }
+
+    float* perlinArray = new float[perlinArrayLenght];//массив, куда я засуну все векторы
+    int slider = 0;
+    for (int octave = 1; octave <= map->octaveAmount; octave++) { //засовываю все октавы в массив друг за другом
+        float* currentOctave = new float[(int)pow((pow(2, octave-1) * map->initSize + 1), 2)]; //текущая октава (пока пустая)
+        currentOctave = createGrid(map->seed, (int)(pow(2, octave-1)*map->initSize)); //наполняю октаву
+        for (int i = 0; i < (int)pow((pow(2, octave - 1) * map->initSize + 1), 2); i++) { //переношу октаву в массив
+            perlinArray[slider] = currentOctave[i];
+            slider++;
+        }
+        delete[](currentOctave);
+    }
+
+    map->perlinGrid = perlinArray; //сохраняю шум
+    GlobalTile* globalMapArray = new GlobalTile[(int)(pow(map->globalMapSideSize, 2))]; //сюда сохранить глобальную карту
+
+    //дальше собираем глобальную карту
+    int t = 0;
+    for (int i = 0; i < map->octaveAmount; i++) {
+        t = t + pow(2, i);
+    }
+    int low = (t / pow(2, (map->octaveAmount - 1))); //число, на которое стоит поделить все высоты после создания полной сетки со всеми слоями
+
+    float* heightMap = new float[(int)(pow(map->globalMapSideSize, 2))];//карта высот
+
+    for (int octave = 1; octave <= map->octaveAmount; octave++) { //создавать карту по октаве
+
+        int l = (int)(pow(2, octave - 1) * map->initSize + 1);//длинна стороны одной октавы
+        float* stackGrid = new float[(int)(pow(l, 2))]; //текущая октава
+        for (int i = 0; i < (int)(pow(l, 2)); i++) {//копируем октаву
+            stackGrid[i] = map->perlinGrid[map->getOctaveOffset(octave) + i];//getOctaveOffset неразрешенный внешний элемент
+        }
+
+        float step = pow(map->initSize, octave) / map->globalMapSideSize; //скольки координатам на октаве соответствует координата на arr2d
+
+        for (int x = 0; x < map->globalMapSideSize; x++) {//создаём высотную карту
+            for (int y = 0; y < map->globalMapSideSize; y++) {
+                heightMap[x + y * map->globalMapSideSize] += getNoiseValue(x*step, y*step, stackGrid, l)/pow(2, octave - 1);
+            }
+        }
+
+        delete[](stackGrid);//удалить копию
+    }
+
+    for (int i = 0; i < (int)pow(map->globalMapSideSize, 2); i++) {//конвертирую в высоты в кубах
+        heightMap[i] = (heightMap[i] / low * 10 + 128);
+    }
+
+    for (int i = 0; i < (int)pow(map->globalMapSideSize, 2); i++) {//конвертирую в globalMap тайлы
+        if (heightMap[i] <= 118) {
+            globalMapArray[i] = LOWLANDS;
+        }
+        else if (heightMap[i] >= 138) {
+            globalMapArray[i] = MOUNTAINS;
+        }
+        else {
+            globalMapArray[i] = PLAINS;
+        }
+    }
+    map->globalMap = globalMapArray;//сохраняю ссылку в обьекте
+    delete[](heightMap);//удаляю карту высот
+    
 }
 
 arr2d<float, 256, 256>* createHeightMap(int order, int startScale, int seed) {//order - количество октав, startScale - колво кубиков на первой октаве
@@ -125,7 +205,7 @@ arr2d<float, 256, 256>* createHeightMap(int order, int startScale, int seed) {//
             }
          }
 
-        delete(stack_grid);//почистить память
+        delete[](stack_grid);//почистить память
     }
     
     for (int x = 0; x < 256; x++) { // сжать

@@ -13,18 +13,22 @@
 
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
-static LocalMap* map = new LocalMap; //локальная карта, переместить потом
+static GlobalMap* map = new GlobalMap; //локальная карта, переместить потом
 static Screen screen = MAIN_MENU; //текущий экран
 static int screenWidth = 1920;
 static int screenHeight = 1080;
 
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv) {
 	map->viewedZLevel = 128;
+	map->octaveAmount = 1;
+	map->initSize = 2;
+	map->globalMapSideSize = 64;
 	inputHandlerInit(map, screenWidth, screenHeight); //инициализация инпут функций
 	SDL_Init(SDL_INIT_VIDEO); //инициализация всего
 	window = SDL_CreateWindow("main", screenWidth, screenHeight, NULL);
 	renderer = SDL_CreateRenderer(window, NULL);
-	drawToolsInit(renderer, screenWidth, screenHeight);//запихиваю важные переменные в drawTools
+	drawToolsInit(renderer, map, screenWidth, screenHeight);//запихиваю важные переменные в drawTools
+	generatorsInit(map);
 	return SDL_APP_CONTINUE;
 };
 
@@ -37,7 +41,8 @@ SDL_AppResult SDL_AppIterate(void* appstate) {
 		drawMainMenu();
 		break;
 	case GAME_SCREEN:
-		drawFrame(map->tileMap, map->viewedZLevel); //!!!
+		//drawFrame(map->tileMap, map->viewedZLevel); //!!!
+		drawMap();
 		break;
 	};
 	

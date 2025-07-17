@@ -8,9 +8,9 @@
 
 static int windowWidth;
 static int windowHeight;
-static LocalMap* map;
+static GlobalMap* map;
 
-void inputHandlerInit(LocalMap* m, int w, int h) {
+void inputHandlerInit(GlobalMap* m, int w, int h) {
 	map = m;
 	windowWidth = w;
 	windowHeight = h;
@@ -23,7 +23,8 @@ void mouseInput(SDL_Event* event, Screen &screen) {
 	//нажатие кнопки старт пускает сразу на экран игры, создаёт новый мир
 	if ((x > 0.45 * windowWidth) and (x < 0.55 * windowWidth) and (y > 0.45 * windowHeight) and (y < 0.55 * windowHeight)) {
 		map->seed = generateSeed();
-		map->tileMap = generateOnHeightMap(map->seed);//!!!
+		firstGeneratingSequence();
+		//map->tileMap = generateOnHeightMap(map->seed);//!!!
 		screen = GAME_SCREEN;
 	}
 }
@@ -50,7 +51,8 @@ void keyboardInput(SDL_Event* event, Screen &screen) {
 		SDL_Keycode key = event->key.key;
 		if (key == SDLK_L) {
 			map->seed = load();
-			map->tileMap = generateOnHeightMap(map->seed);//сгенерировать карту по имеющемуся сиду
+			firstGeneratingSequence();
+			//map->tileMap = generateOnHeightMap(map->seed);//сгенерировать карту по имеющемуся сиду
 			screen = GAME_SCREEN;
 		}
 		break;

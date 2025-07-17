@@ -10,3 +10,9 @@ enum Screen {
 	MAIN_MENU,
 	GAME_SCREEN,
 };
+
+enum GlobalTile {
+	MOUNTAINS,
+	PLAINS,
+	LOWLANDS
+};
