@@ -19,5 +19,12 @@ struct GlobalMap {
 	float* perlinGrid;
 	int octaveAmount;
 	int initSize;
-	int getOctaveOffset(int octave);
+	int getOctaveOffset(int octave) {//helper for perlin noise access
+		int offset = 0;
+		for (int i = 0; i < octave; i++) {
+			offset += (int)pow((pow(2, i) * initSize + 1), 2);
+		}
+		return offset;
+	};
+	
 };

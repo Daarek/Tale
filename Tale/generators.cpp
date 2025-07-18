@@ -10,7 +10,7 @@
 static float M_PI = 3.14159265;
 static float rad = (M_PI / 180);
 
-static GlobalMap* map;
+GlobalMap* map;
 
 int generateSeed() {
 
@@ -132,7 +132,9 @@ void firstGeneratingSequence() {
     }
 
     map->perlinGrid = perlinArray; //сохраняю шум
-    GlobalTile* globalMapArray = new GlobalTile[(int)(pow(map->globalMapSideSize, 2))]; //сюда сохранить глобальную карту
+
+    int size = (int)(pow(map->globalMapSideSize, 2));
+    GlobalTile* globalMapArray = new GlobalTile[size]; //сюда сохранить глобальную карту
 
     //дальше собираем глобальную карту
     int t = 0;
@@ -141,14 +143,18 @@ void firstGeneratingSequence() {
     }
     int low = (t / pow(2, (map->octaveAmount - 1))); //число, на которое стоит поделить все высоты после создания полной сетки со всеми слоями
 
-    float* heightMap = new float[(int)(pow(map->globalMapSideSize, 2))];//карта высот
+    //int heightMapSize = (int)(pow(map->globalMapSideSize, 2));
+    float* heightMap = new float[size];//карта высот
+    for (int i = 0; i < size; i++) {//зануляю
+        heightMap[i] = 0.0f;
+    }
 
     for (int octave = 1; octave <= map->octaveAmount; octave++) { //создавать карту по октаве
 
         int l = (int)(pow(2, octave - 1) * map->initSize + 1);//длинна стороны одной октавы
         float* stackGrid = new float[(int)(pow(l, 2))]; //текущая октава
         for (int i = 0; i < (int)(pow(l, 2)); i++) {//копируем октаву
-            stackGrid[i] = map->perlinGrid[map->getOctaveOffset(octave) + i];//getOctaveOffset неразрешенный внешний элемент
+            stackGrid[i] = map->perlinGrid[map->getOctaveOffset(octave) + i];
         }
 
         float step = pow(map->initSize, octave) / map->globalMapSideSize; //скольки координатам на октаве соответствует координата на arr2d
@@ -163,7 +169,7 @@ void firstGeneratingSequence() {
     }
 
     for (int i = 0; i < (int)pow(map->globalMapSideSize, 2); i++) {//конвертирую в высоты в кубах
-        heightMap[i] = (heightMap[i] / low * 10 + 128);
+        heightMap[i] = (heightMap[i]/low * 49 + 128);
     }
 
     for (int i = 0; i < (int)pow(map->globalMapSideSize, 2); i++) {//конвертирую в globalMap тайлы
