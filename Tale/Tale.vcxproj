@@ -137,6 +137,7 @@
     </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="drawTools.cpp" />
+    <ClCompile Include="projectData.cpp" />
     <ClCompile Include="saveFileHandler.cpp" />
     <ClCompile Include="temporary.cpp" />
   </ItemGroup>
@@ -146,6 +147,7 @@
     <ClInclude Include="generators.h" />
     <ClInclude Include="inputHandler.h" />
     <ClInclude Include="localMap.h" />
+    <ClInclude Include="projectData.h" />
     <ClInclude Include="saveFileHandler.h" />
     <ClInclude Include="SDL.h" />
     <ClInclude Include="templates.h" />

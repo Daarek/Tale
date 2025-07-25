@@ -6,11 +6,12 @@
 #include <random>
 #include "localMap.h"
 #include "enums.h"
+#include "projectData.h"
 //using namespace std;
 static float M_PI = 3.14159265;
 static float rad = (M_PI / 180);
 
-GlobalMap* map;
+static Data* data;
 
 int generateSeed() {
 
@@ -20,8 +21,8 @@ int generateSeed() {
 
 }
 
-void generatorsInit(GlobalMap* m) {
-    map = m;
+void generators_getData(Data* d) {
+    data = d;
 }
 
 static float smoothStep(float t) {
@@ -115,64 +116,63 @@ void firstGeneratingSequence() {
 
     int perlinArrayLenght = 0;
 
-    for (int i = 0; i < map->octaveAmount; i++) {
-        perlinArrayLenght += (int)pow((pow(2, i) * map->initSize + 1), 2);
+    for (int i = 0; i < data->globalMap->octaveAmount; i++) {
+        perlinArrayLenght += (int)pow((pow(2, i) * data->globalMap->initSize + 1), 2);
     }
 
     float* perlinArray = new float[perlinArrayLenght];//массив, куда я засуну все векторы
     int slider = 0;
-    for (int octave = 1; octave <= map->octaveAmount; octave++) { //засовываю все октавы в массив друг за другом
-        float* currentOctave = new float[(int)pow((pow(2, octave-1) * map->initSize + 1), 2)]; //текущая октава (пока пустая)
-        currentOctave = createGrid(map->seed, (int)(pow(2, octave-1)*map->initSize)); //наполняю октаву
-        for (int i = 0; i < (int)pow((pow(2, octave - 1) * map->initSize + 1), 2); i++) { //переношу октаву в массив
+    for (int octave = 1; octave <= data->globalMap->octaveAmount; octave++) { //засовываю все октавы в массив друг за другом
+        float* currentOctave = new float[(int)pow((pow(2, octave-1) * data->globalMap->initSize + 1), 2)]; //текущая октава (пока пустая)
+        currentOctave = createGrid(data->globalMap->seed, (int)(pow(2, octave-1)*data->globalMap->initSize)); //наполняю октаву
+        for (int i = 0; i < (int)pow((pow(2, octave - 1) * data->globalMap->initSize + 1), 2); i++) { //переношу октаву в массив
             perlinArray[slider] = currentOctave[i];
             slider++;
         }
         delete[](currentOctave);
     }
 
-    map->perlinGrid = perlinArray; //сохраняю шум
+    data->globalMap->perlinGrid = perlinArray; //сохраняю шум
 
-    int size = (int)(pow(map->globalMapSideSize, 2));
+    int size = (int)(pow(data->globalMap->globalMapSideSize, 2));
     GlobalTile* globalMapArray = new GlobalTile[size]; //сюда сохранить глобальную карту
 
     //дальше собираем глобальную карту
     int t = 0;
-    for (int i = 0; i < map->octaveAmount; i++) {
+    for (int i = 0; i < data->globalMap->octaveAmount; i++) {
         t = t + pow(2, i);
     }
-    int low = (t / pow(2, (map->octaveAmount - 1))); //число, на которое стоит поделить все высоты после создания полной сетки со всеми слоями
+    int low = (t / pow(2, (data->globalMap->octaveAmount - 1))); //число, на которое стоит поделить все высоты после создания полной сетки со всеми слоями
 
     //int heightMapSize = (int)(pow(map->globalMapSideSize, 2));
     float* heightMap = new float[size];//карта высот
     for (int i = 0; i < size; i++) {//зануляю
         heightMap[i] = 0.0f;
     }
+    for (int octave = 1; octave <= data->globalMap->octaveAmount; octave++) { //создавать карту по октаве
 
-    for (int octave = 1; octave <= map->octaveAmount; octave++) { //создавать карту по октаве
-
-        int l = (int)(pow(2, octave - 1) * map->initSize + 1);//длинна стороны одной октавы
+        int l = (int)(pow(2, octave - 1) * data->globalMap->initSize + 1);//длинна стороны одной октавы
         float* stackGrid = new float[(int)(pow(l, 2))]; //текущая октава
         for (int i = 0; i < (int)(pow(l, 2)); i++) {//копируем октаву
-            stackGrid[i] = map->perlinGrid[map->getOctaveOffset(octave) + i];
+            stackGrid[i] = data->globalMap->perlinGrid[data->globalMap->getOctaveOffset(octave - 1) + i]; //Вызвано исключение по адресу 0x00007FF6E1FE62D4 в Tale.exe: 0xC0000005: нарушение прав доступа при чтении по адресу 0x000001FD3BDCF000.
         }
 
-        float step = pow(map->initSize, octave) / map->globalMapSideSize; //скольки координатам на октаве соответствует координата на arr2d
+        float step = pow(data->globalMap->initSize, octave) / data->globalMap->globalMapSideSize; //скольки координатам на октаве соответствует координата на arr2d
 
-        for (int x = 0; x < map->globalMapSideSize; x++) {//создаём высотную карту
-            for (int y = 0; y < map->globalMapSideSize; y++) {
-                heightMap[x + y * map->globalMapSideSize] += getNoiseValue(x*step, y*step, stackGrid, l)/pow(2, octave - 1);
+        for (int x = 0; x < data->globalMap->globalMapSideSize; x++) {//создаём высотную карту
+            for (int y = 0; y < data->globalMap->globalMapSideSize; y++) {
+                heightMap[x + y * data->globalMap->globalMapSideSize] += getNoiseValue(x*step, y*step, stackGrid, l)/pow(2, octave - 1);
             }
         }
 
         delete[](stackGrid);//удалить копию
     }
 
-    for (int i = 0; i < (int)pow(map->globalMapSideSize, 2); i++) {//конвертирую в высоты в кубах
+    for (int i = 0; i < (int)pow(data->globalMap->globalMapSideSize, 2); i++) {//конвертирую в высоты в кубах
         heightMap[i] = (heightMap[i]/low * 49 + 128);
     }
 
-    for (int i = 0; i < (int)pow(map->globalMapSideSize, 2); i++) {//конвертирую в globalMap тайлы
+    for (int i = 0; i < (int)pow(data->globalMap->globalMapSideSize, 2); i++) {//конвертирую в globalMap тайлы
         if (heightMap[i] <= 118) {
             globalMapArray[i] = LOWLANDS;
         }
@@ -183,7 +183,7 @@ void firstGeneratingSequence() {
             globalMapArray[i] = PLAINS;
         }
     }
-    map->globalMap = globalMapArray;//сохраняю ссылку в обьекте
+    data->globalMap->globalMap = globalMapArray;//сохраняю ссылку в обьекте
     delete[](heightMap);//удаляю карту высот
     
 }

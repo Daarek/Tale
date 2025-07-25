@@ -10,43 +10,46 @@
 #include "inputHandler.h"
 #include "generators.h"
 #include "saveFileHandler.h"
+#include "projectData.h"
 
 SDL_Window* window = NULL;
-SDL_Renderer* renderer = NULL;
-static GlobalMap* map = new GlobalMap; //локальная карта, переместить потом
-static Screen screen = MAIN_MENU; //текущий экран
-static int screenWidth = 1920;
-static int screenHeight = 1080;
+static Data* data = new Data; //хранилище всей необходимой для работы информации
 
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv) {
-	map->viewedZLevel = 128;
-	map->octaveAmount = 1;
-	map->initSize = 2;
-	map->globalMapSideSize = 64;
-	inputHandlerInit(map, screenWidth, screenHeight); //инициализация инпут функций
+	data->globalMap = new GlobalMap;
+	data->globalMap->viewedZLevel = 128;
+	data->globalMap->octaveAmount = 2;
+	data->globalMap->initSize = 8;
+	data->globalMap->globalMapSideSize = 64;
+	data->scale = 64;
+	data->windowHeight = 1080;
+	data->windowWidth = 1920;
+	data->startOffsetY = (int)((data->windowHeight - ((int)(data->windowHeight / data->scale) * data->scale)) / 2);
+	data->startOffsetX = (int)((data->windowWidth - ((int)(data->windowHeight / data->scale) * data->scale)) / 2);
+	data->screen = MAIN_MENU;
+	inputHandler_getData(data); //инициализация инпут функций
 	SDL_Init(SDL_INIT_VIDEO); //инициализация всего
-	window = SDL_CreateWindow("main", screenWidth, screenHeight, NULL);
-	renderer = SDL_CreateRenderer(window, NULL);
-	drawToolsInit(renderer, map, screenWidth, screenHeight);//запихиваю важные переменные в drawTools
-	generatorsInit(map);
+	window = SDL_CreateWindow("main", data->windowWidth, data->windowHeight, NULL);
+	data->renderer = SDL_CreateRenderer(window, NULL);
+	drawTools_getData(data);
+	generators_getData(data);
 	return SDL_APP_CONTINUE;
 };
 
 SDL_AppResult SDL_AppIterate(void* appstate) {
 	
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-	SDL_RenderClear(renderer);
-	switch (screen) {  //определяет, какой "экран" рисовать
+	SDL_SetRenderDrawColor(data->renderer, 0, 0, 0, 255);
+	SDL_RenderClear(data->renderer);
+	switch (data->screen) {  //определяет, какой "экран" рисовать
 	case MAIN_MENU:
 		drawMainMenu();
 		break;
-	case GAME_SCREEN:
-		//drawFrame(map->tileMap, map->viewedZLevel); //!!!
+	case GAME_SCREEN_GLOBAL_MAP:
 		drawMap();
 		break;
 	};
 	
-	SDL_RenderPresent(renderer); //закончить прорисовку
+	SDL_RenderPresent(data->renderer); //закончить прорисовку
 	return SDL_APP_CONTINUE;
 };
 
@@ -54,17 +57,17 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) { //ивенты
 	switch (event->type) {
 
 	case SDL_EVENT_QUIT: {//выход из приложения
-		save(map->seed);
+		save(data->globalMap->seed);
 		return SDL_APP_SUCCESS;
 		break;
 	}
 
 	case SDL_EVENT_KEY_DOWN: {//клавиатура
-		keyboardInput(event, screen);
+		keyboardInput(event);
 		break;
 	}
 	case SDL_EVENT_MOUSE_BUTTON_DOWN: {//жмак мышкой 
-		mouseInput(event, screen);
+		mouseInput(event);
 		break;
 	}
 
@@ -75,8 +78,9 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) { //ивенты
 void SDL_AppQuit(void* appstate, SDL_AppResult result) {
 	SDL_DestroyWindow(window);
 	window = NULL;
-	SDL_DestroyRenderer(renderer);
-	renderer = NULL;
+	SDL_DestroyRenderer(data->renderer);
+	data->renderer = NULL;
 	SDL_QuitSubSystem(SDL_INIT_VIDEO);
-	delete(map);
+	delete(data->globalMap);
+	delete(data);
 };

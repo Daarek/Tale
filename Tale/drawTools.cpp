@@ -2,10 +2,10 @@
 #include "enums.h"
 #include "templates.h"
 #include "localMap.h"
+#include "projectData.h"
 #include <iostream>
 
-static SDL_Renderer* renderer = NULL;//renderer
-static GlobalMap* globalMap;
+static Data* data;
 
 static SDL_Texture* placeholder = NULL;//текстура заполнитель
 static SDL_Texture* betaTileset = NULL;//тестовый тайлсет     ===> заменить все на 32х32 когда нибудь
@@ -16,25 +16,28 @@ static int scale = 64; //в будущем зум сделать кастомизируемым, сколько тайлов п
 static int screenWidth;
 static int screenHeight;
 
+static int startOffsetX;
+static int startOffsetY;
+
 static SDL_FRect cut(int x, int y) { //функция, находит нужный квадратик тайлсета по его координатам на пнгшке
 	return { (float)(32 * x), (float)(32 * y), 32.f, 32.f };
 };
 
-void drawToolsInit(SDL_Renderer* rend, GlobalMap* map, int w, int h) { //функция, чтобы передать всё нужное из main сюда
-	renderer = rend;
-	globalMap = map;
-	placeholder = IMG_LoadTexture(renderer, "Assets/coconut.png"); //инициализирую текстуры
-	betaTileset = IMG_LoadTexture(renderer, "Assets/ts_simple32.png");
-	rat16 = IMG_LoadTexture(renderer, "Assets/rat.png");
-	fog = IMG_LoadTexture(renderer, "Assets/ts_fog.png");
-	screenWidth = w;
-	screenHeight = h;
-};
+void drawTools_getData(Data *d) {
+	data = d;
+
+	placeholder = IMG_LoadTexture(data->renderer, "Assets/coconut.png"); //инициализирую текстуры
+	betaTileset = IMG_LoadTexture(data->renderer, "Assets/ts_simple32.png");
+	rat16 = IMG_LoadTexture(data->renderer, "Assets/rat.png");
+	fog = IMG_LoadTexture(data->renderer, "Assets/ts_fog.png");
+
+
+}
 
 static void drawTile(Tile tile, int x, int y) { //нарисовать тайл
 	SDL_FRect i; //какой тайл рисовать
-	int side = (int)(1024 / scale); //длинна стороны тайла в пикселях
-	SDL_FRect pos = { x*side, y*side, side, side }; //место, куда на экране нарисовать тайл
+	int side = (int)(data->windowHeight / data->scale); //длинна стороны тайла в пикселях
+	SDL_FRect pos = { x*side + data->startOffsetX, y*side + data->startOffsetY, side, side }; //место, куда на экране нарисовать тайл
 	switch (tile) { //выбирает тайл для рисовки и срезает его с тайлсета
 	case AIR:
 		break;
@@ -46,23 +49,23 @@ static void drawTile(Tile tile, int x, int y) { //нарисовать тайл
 		break;
 
 	};
-	SDL_RenderTexture(renderer, betaTileset, &i, &pos); //рисует
+	SDL_RenderTexture(data->renderer, betaTileset, &i, &pos); //рисует
 };
 
 static void drawFog(int lvl, int x, int y) {
 	SDL_FRect i = cut(lvl-1, 0); //какой тайл рисовать
-	int side = (int)(1024 / scale); //длинна стороны тайла в пикселях
-	SDL_FRect pos = { x * side, y * side, side, side }; //место, куда на экране нарисовать тайл
-	SDL_RenderTexture(renderer, fog, &i, &pos); //рисует
+	int side = (int)(data->windowHeight / data->scale); //длинна стороны тайла в пикселях
+	SDL_FRect pos = { x * side + data->startOffsetX, y * side + data->startOffsetY, side, side }; //место, куда на экране нарисовать тайл
+	SDL_RenderTexture(data->renderer, fog, &i, &pos); //рисует
 }
 
 void drawMap() {
-	for (int x = 0; x < globalMap->globalMapSideSize; x++) {
-		for (int y = 0; y < globalMap->globalMapSideSize; y++) {
-			if (globalMap->globalMap[x + globalMap->globalMapSideSize * y] == LOWLANDS) {
+	for (int x = 0; x < data->globalMap->globalMapSideSize; x++) {
+		for (int y = 0; y < data->globalMap->globalMapSideSize; y++) {
+			if (data->globalMap->globalMap[x + data->globalMap->globalMapSideSize * y] == LOWLANDS) {
 				drawFog(5, x, y);
 			}
-			else if (globalMap->globalMap[x + globalMap->globalMapSideSize * y] == MOUNTAINS) {
+			else if (data->globalMap->globalMap[x + data->globalMap->globalMapSideSize * y] == MOUNTAINS) {
 				drawTile(STONE, x, y);
 			}
 			else {
@@ -101,10 +104,12 @@ void drawFrame(const arr3d<Tile, 64, 64, 256>* arr, int z) { //потом всё перекоп
 void drawMainMenu() { //рисует главное меню
 
 	//рисует кнопку старт, переделать потом с текстурами
-	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-	SDL_RenderLine(renderer, (screenWidth / 2 - screenWidth / 20), (screenHeight / 2 - screenHeight / 20), (screenWidth / 2 + screenWidth / 20), (screenHeight / 2 - screenHeight / 20));
-	SDL_RenderLine(renderer, (screenWidth / 2 - screenWidth / 20), (screenHeight / 2 + screenHeight / 20), (screenWidth / 2 + screenWidth / 20), (screenHeight / 2 + screenHeight / 20));
-	SDL_RenderLine(renderer, (screenWidth / 2 - screenWidth / 20), (screenHeight / 2 - screenHeight / 20), (screenWidth / 2 - screenWidth / 20), (screenHeight / 2 + screenHeight / 20));
-	SDL_RenderLine(renderer, (screenWidth / 2 + screenWidth / 20), (screenHeight / 2 - screenHeight / 20), (screenWidth / 2 + screenWidth / 20), (screenHeight / 2 + screenHeight / 20));
+	int screenWidth = data->windowWidth;
+	int screenHeight = data->windowHeight;
+	SDL_SetRenderDrawColor(data->renderer, 255, 255, 255, 255);
+	SDL_RenderLine(data->renderer, (screenWidth / 2 - screenWidth / 20), (screenHeight / 2 - screenHeight / 20), (screenWidth / 2 + screenWidth / 20), (screenHeight / 2 - screenHeight / 20));
+	SDL_RenderLine(data->renderer, (screenWidth / 2 - screenWidth / 20), (screenHeight / 2 + screenHeight / 20), (screenWidth / 2 + screenWidth / 20), (screenHeight / 2 + screenHeight / 20));
+	SDL_RenderLine(data->renderer, (screenWidth / 2 - screenWidth / 20), (screenHeight / 2 - screenHeight / 20), (screenWidth / 2 - screenWidth / 20), (screenHeight / 2 + screenHeight / 20));
+	SDL_RenderLine(data->renderer, (screenWidth / 2 + screenWidth / 20), (screenHeight / 2 - screenHeight / 20), (screenWidth / 2 + screenWidth / 20), (screenHeight / 2 + screenHeight / 20));
 	
 };
