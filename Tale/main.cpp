@@ -27,6 +27,8 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv) {
 	data->startOffsetY = (int)((data->windowHeight - ((int)(data->windowHeight / data->scale) * data->scale)) / 2);
 	data->startOffsetX = (int)((data->windowWidth - ((int)(data->windowHeight / data->scale) * data->scale)) / 2);
 	data->screen = MAIN_MENU;
+	arr3d<Tile, 64, 64, 256>* temp = new arr3d<Tile, 64, 64, 256>;
+	data->globalMap->tileMap = temp;
 	inputHandler_getData(data); //инициализация инпут функций
 	SDL_Init(SDL_INIT_VIDEO); //инициализация всего
 	window = SDL_CreateWindow("main", data->windowWidth, data->windowHeight, NULL);
@@ -43,6 +45,9 @@ SDL_AppResult SDL_AppIterate(void* appstate) {
 	switch (data->screen) {  //определяет, какой "экран" рисовать
 	case MAIN_MENU:
 		drawMainMenu();
+		break;
+	case GAME_SCREEN:
+		drawFrame();
 		break;
 	case GAME_SCREEN_GLOBAL_MAP:
 		drawMap();

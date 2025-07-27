@@ -11,5 +11,5 @@ void generators_getData(Data* d);
 void firstGeneratingSequence();
 /*
 float* createGrid(int seed, int size);
-float getNoiseValue(double x, double y, float* vectors, int size);
 */
+float getNoiseValue(float x, float y, float* vectors, int size);

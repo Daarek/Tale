@@ -8,6 +8,6 @@
 
 void drawTools_getData(Data* d);
 void drawTile(Tile tile, int x, int y);
-void drawFrame(const arr3d<Tile, 64, 64, 256>* arr, int z);
+void drawFrame();
 void drawMainMenu();
 void drawMap();

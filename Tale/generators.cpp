@@ -51,7 +51,7 @@ static float interpolate(float x1, float y1, float x2, float y2, float x3, float
     return amp * smoothStep(relx) + grand;
 }
 
-float getNoiseValue(float x, float y, float* vectors, int size) {//найти значение шума в точке на сетке перлина
+float getNoiseValue(float x, float y, float* vectors, int size) {//найти значение шума в точке на сетке перлина, size в квадратиках
     int xl = floor(x); //x двух левых векторов
     int yb = floor(y); //y двух нижних векторов
 
@@ -134,7 +134,7 @@ void firstGeneratingSequence() {
 
     data->globalMap->perlinGrid = perlinArray; //сохраняю шум
 
-    int size = (int)(pow(data->globalMap->globalMapSideSize, 2));
+    int size = (int)(pow(data->globalMap->globalMapSideSize, 2));//размер карты в кол-ве чанков
     GlobalTile* globalMapArray = new GlobalTile[size]; //сюда сохранить глобальную карту
 
     //дальше собираем глобальную карту
@@ -144,7 +144,6 @@ void firstGeneratingSequence() {
     }
     int low = (t / pow(2, (data->globalMap->octaveAmount - 1))); //число, на которое стоит поделить все высоты после создания полной сетки со всеми слоями
 
-    //int heightMapSize = (int)(pow(map->globalMapSideSize, 2));
     float* heightMap = new float[size];//карта высот
     for (int i = 0; i < size; i++) {//зануляю
         heightMap[i] = 0.0f;

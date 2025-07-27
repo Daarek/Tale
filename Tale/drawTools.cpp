@@ -12,13 +12,6 @@ static SDL_Texture* betaTileset = NULL;//тестовый тайлсет     ===> заменить все 
 static SDL_Texture* rat16 = NULL; //мыш
 static SDL_Texture* fog = NULL;//туманъ
 
-static int scale = 64; //в будущем зум сделать кастомизируемым, сколько тайлов помещается на экран
-static int screenWidth;
-static int screenHeight;
-
-static int startOffsetX;
-static int startOffsetY;
-
 static SDL_FRect cut(int x, int y) { //функция, находит нужный квадратик тайлсета по его координатам на пнгшке
 	return { (float)(32 * x), (float)(32 * y), 32.f, 32.f };
 };
@@ -75,17 +68,18 @@ void drawMap() {
 	}
 }
 
-void drawFrame(const arr3d<Tile, 64, 64, 256>* arr, int z) { //потом всё перекопать, это тест, рисует GAME_SCREEN
+void drawFrame() { //потом всё перекопать, это тест, рисует GAME_SCREEN
+	int z = data->globalMap->viewedZLevel;
 	for (int x = 0; x < 64; x++) {
 		for (int y = 0; y < 64; y++) {
-			if ((*arr)[z][x][y] != AIR) {//если на этом месте есть тайл, нарисовать его
-				drawTile((*arr)[z][x][y], x, y);
+			if ((*data->globalMap->tileMap)[z][x][y] != AIR) {//если на этом месте есть тайл, нарисовать его
+				drawTile((*data->globalMap->tileMap)[z][x][y], x, y);
 			}
 			else {
-				bool flag = true;
+				bool flag = true;//flag - есть ли блок ближе 5-ти тайлов вниз
 				for (int i = 1; i <= 5; i++) { //иначе рисовать туманы
-					if ((*arr)[z - i][x][y] != AIR) {
-						drawTile((*arr)[z - i][x][y], x, y);
+					if ((*data->globalMap->tileMap)[z - i][x][y] != AIR) {//если наткнулся на блок
+						drawTile((*data->globalMap->tileMap)[z - i][x][y], x, y);
 						drawFog(i, x, y);
 						flag = false;
 						break;
