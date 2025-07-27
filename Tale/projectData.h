@@ -9,6 +9,7 @@ struct Data {
 	int windowWidth; //ширина и высота монитара
 	int windowHeight;
 	int scale; //сколько тайлов должно помещаться на экране
+	int side;
 	int startOffsetX; //координата X и Y самого левого верхнего угла самого верхнего левого тайла
 	int startOffsetY;
 	Screen screen;

@@ -24,6 +24,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv) {
 	data->scale = 64;
 	data->windowHeight = 1080;
 	data->windowWidth = 1920;
+	data->side = (int)(data->windowHeight / data->scale);
 	data->startOffsetY = (int)((data->windowHeight - ((int)(data->windowHeight / data->scale) * data->scale)) / 2);
 	data->startOffsetX = (int)((data->windowWidth - ((int)(data->windowHeight / data->scale) * data->scale)) / 2);
 	data->screen = MAIN_MENU;

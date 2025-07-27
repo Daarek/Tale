@@ -29,8 +29,7 @@ void drawTools_getData(Data *d) {
 
 static void drawTile(Tile tile, int x, int y) { //нарисовать тайл
 	SDL_FRect i; //какой тайл рисовать
-	int side = (int)(data->windowHeight / data->scale); //длинна стороны тайла в пикселях
-	SDL_FRect pos = { x*side + data->startOffsetX, y*side + data->startOffsetY, side, side }; //место, куда на экране нарисовать тайл
+	SDL_FRect pos = { x*data->side + data->startOffsetX, y*data->side + data->startOffsetY, data->side, data->side }; //место, куда на экране нарисовать тайл
 	switch (tile) { //выбирает тайл для рисовки и срезает его с тайлсета
 	case AIR:
 		break;
@@ -47,8 +46,7 @@ static void drawTile(Tile tile, int x, int y) { //нарисовать тайл
 
 static void drawFog(int lvl, int x, int y) {
 	SDL_FRect i = cut(lvl-1, 0); //какой тайл рисовать
-	int side = (int)(data->windowHeight / data->scale); //длинна стороны тайла в пикселях
-	SDL_FRect pos = { x * side + data->startOffsetX, y * side + data->startOffsetY, side, side }; //место, куда на экране нарисовать тайл
+	SDL_FRect pos = { x * data->side + data->startOffsetX, y * data->side + data->startOffsetY, data->side, data->side }; //место, куда на экране нарисовать тайл
 	SDL_RenderTexture(data->renderer, fog, &i, &pos); //рисует
 }
 
