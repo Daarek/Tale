@@ -18,8 +18,8 @@ static Data* data = new Data; //хранилище всей необходимой для работы информации
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv) {
 	data->globalMap = new GlobalMap;
 	data->globalMap->viewedZLevel = 128;
-	data->globalMap->octaveAmount = 2;
-	data->globalMap->initSize = 8;
+	data->globalMap->octaveAmount = 4;//уровень детализации
+	data->globalMap->initSize = 4;//грубо говоря, размер биомов (количество чанков шума)
 	data->globalMap->globalMapSideSize = 64;
 	data->scale = 64;
 	data->windowHeight = 1080;

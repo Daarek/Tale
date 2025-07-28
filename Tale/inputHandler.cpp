@@ -32,9 +32,9 @@ void mouseInput(SDL_Event* event) {
 	case GAME_SCREEN_GLOBAL_MAP: {//перенести в генераторы позже
 		//если тык в пределах игрового экрана
 		if ((x > data->startOffsetX and x < (data->windowWidth - data->startOffsetX)) and (y > data->startOffsetY and y < (data->windowHeight - data->startOffsetY))) {
-			x = (int)((x - data->startOffsetX) / data->side);
-			y = (int)((y - data->startOffsetY) / data->side);//теперь x и y - координаты кликнутого тайла
-			createChunk(x, y);
+			data->globalMap->viewedChunkX = (int)((x - data->startOffsetX) / data->side);
+			data->globalMap->viewedChunkY = (int)((y - data->startOffsetY) / data->side);//координаты кликнутого тайла
+			createChunk();
 			data->screen = GAME_SCREEN;
 		}
 		break;
@@ -57,8 +57,32 @@ void keyboardInput(SDL_Event* event) {
 				data->globalMap->viewedZLevel--;
 			}
 		}
-		else if (key == SDLK_Q) {
+		else if (key == SDLK_M) {//открыть глобальную карту
 			data->screen = GAME_SCREEN_GLOBAL_MAP;
+		}
+		else if (key == SDLK_UP) {//открыть чанк сверху
+			if (data->globalMap->viewedChunkY > 0) {
+				data->globalMap->viewedChunkY--;
+				createChunk();
+			}
+		}
+		else if (key == SDLK_DOWN) {//открыть чанк сверху
+			if (data->globalMap->viewedChunkY <63) {
+				data->globalMap->viewedChunkY++;
+				createChunk();
+			}
+		}
+		else if (key == SDLK_LEFT) {//открыть чанк сверху
+			if (data->globalMap->viewedChunkX > 0) {
+				data->globalMap->viewedChunkX--;
+				createChunk();
+			}
+		}
+		else if (key == SDLK_RIGHT) {//открыть чанк сверху
+			if (data->globalMap->viewedChunkX < 63) {
+				data->globalMap->viewedChunkX++;
+				createChunk();
+			}
 		}
 		break;
 	}

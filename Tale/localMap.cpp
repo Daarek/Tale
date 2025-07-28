@@ -17,6 +17,8 @@ struct GlobalMap {
 	GlobalTile* globalMap; //1d глобальная карта (квадрат)
 
 	int viewedZLevel;// z уровень камеры
+	int viewedChunkX;
+	int viewedChunkY;//x и y просматриваемого чанка
 	int seed;
 	float* perlinGrid; //1d perlin grid
 	int octaveAmount; //amount of perlin octaves

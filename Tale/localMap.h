@@ -15,6 +15,8 @@ struct GlobalMap {
 	int globalMapSideSize;
 	GlobalTile* globalMap;
 	int viewedZLevel;
+	int viewedChunkX;
+	int viewedChunkY;
 	int seed;
 	float* perlinGrid;
 	int octaveAmount;

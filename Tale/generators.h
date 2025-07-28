@@ -13,4 +13,4 @@ void firstGeneratingSequence();
 float* createGrid(int seed, int size);
 */
 float getNoiseValue(float x, float y, float* vectors, int size);
-void createChunk(int globalX, int globalY);
+void createChunk();

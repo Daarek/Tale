@@ -156,8 +156,7 @@ void firstGeneratingSequence() {
             stackGrid[i] = data->globalMap->perlinGrid[data->globalMap->getOctaveOffset(octave - 1) + i]; //Вызвано исключение по адресу 0x00007FF6E1FE62D4 в Tale.exe: 0xC0000005: нарушение прав доступа при чтении по адресу 0x000001FD3BDCF000.
         }
 
-        float step = pow(data->globalMap->initSize, octave) / data->globalMap->globalMapSideSize; //скольки координатам на октаве соответствует координата на arr2d
-
+        float step = data->globalMap->initSize * pow(2, octave - 1) / data->globalMap->globalMapSideSize; //скольки координатам на октаве соответствует координата на arr2d
         for (int x = 0; x < data->globalMap->globalMapSideSize; x++) {//создаём высотную карту
             for (int y = 0; y < data->globalMap->globalMapSideSize; y++) {
                 heightMap[x + y * data->globalMap->globalMapSideSize] += getNoiseValue(x*step, y*step, stackGrid, l)/pow(2, octave - 1);
@@ -223,7 +222,7 @@ arr2d<float, 256, 256>* createHeightMap(int order, int startScale, int seed) {//
 
 }
 
-void createChunk(int globalX, int globalY) {
+void createChunk() {
     int t = 0;
     for (int i = 0; i < data->globalMap->octaveAmount; i++) {
         t = t + pow(2, i);
@@ -243,12 +242,12 @@ void createChunk(int globalX, int globalY) {
             stackGrid[i] = data->globalMap->perlinGrid[data->globalMap->getOctaveOffset(octave - 1) + i];
         }
 
-        float step = pow(data->globalMap->initSize, octave) / data->globalMap->globalMapSideSize; //скольки координатам на октаве соответствует координата на глобальной карте
+        float step = data->globalMap->initSize * pow(2, octave - 1) / data->globalMap->globalMapSideSize; //скольки координатам на октаве соответствует координата на arr2d
         float mStep = step / 64; ////скольки координатам на октаве соответствует координата на чанке
 
         for (int mx = 0; mx < 64; mx++) {//создаём высотную карту, mx и my - координаты тайлов в чанке
             for (int my = 0; my < 64; my++) {
-                heightMap[mx + my * 64] += getNoiseValue(globalX * step + mx * mStep, globalY * step + my * mStep, stackGrid, l - 1) / pow(2, octave - 1);
+                heightMap[mx + my * 64] += getNoiseValue(data->globalMap->viewedChunkX * step + mx * mStep, data->globalMap->viewedChunkY * step + my * mStep, stackGrid, l - 1) / pow(2, octave - 1);
             }
         }
 
