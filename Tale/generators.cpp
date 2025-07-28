@@ -72,14 +72,14 @@ float getNoiseValue(float x, float y, float* vectors, int size) {//найти значени
         float pt = interpolate(xl, yt, xr, yt, x, yt, ptl, ptr); //точка прямо над искомой
         float pb = interpolate(xl, yb, xr, yb, x, yb, pbl, pbr); //точка прямо под искомой
         return interpolate(x, yt, x, yb, x, y, pt, pb);
-        
+
     }
     else if ((xl == x) and (yb != y)) { //точка находится на вертикальном пересечении
         int yt = yb + 1;
 
         float vbl = vectors[xl + (size + 1) * yb]; //вектор нижнего угла
         float vtl = vectors[xl + (size + 1) * yt]; //вектор верхнего угла
-       
+
         float pb = (cos(vbl * rad) * (x - xl)) + (sin(vbl * rad) * (y - yb)); //скалярные произведения, забей
         float pt = (cos(vtl * rad) * (x - xl)) + (sin(vtl * rad) * (y - yt));
 
@@ -159,7 +159,7 @@ void firstGeneratingSequence() {
         float step = data->globalMap->initSize * pow(2, octave - 1) / data->globalMap->globalMapSideSize; //скольки координатам на октаве соответствует координата на arr2d
         for (int x = 0; x < data->globalMap->globalMapSideSize; x++) {//создаём высотную карту
             for (int y = 0; y < data->globalMap->globalMapSideSize; y++) {
-                heightMap[x + y * data->globalMap->globalMapSideSize] += getNoiseValue(x*step, y*step, stackGrid, l)/pow(2, octave - 1);
+                heightMap[x + y * data->globalMap->globalMapSideSize] += getNoiseValue(x * step, y * step, stackGrid, l) / pow(2, octave - 1);; /*getNoiseValue(x * step, y * step, stackGrid, l) / pow(2, octave - 1);*/
             }
         }
 
@@ -167,7 +167,7 @@ void firstGeneratingSequence() {
     }
 
     for (int i = 0; i < (int)pow(data->globalMap->globalMapSideSize, 2); i++) {//конвертирую в высоты в кубах
-        heightMap[i] = (heightMap[i]/low * 49 + 128);
+        heightMap[i] = (int)(heightMap[i]/low * 49 + 128);
     }
 
     for (int i = 0; i < (int)pow(data->globalMap->globalMapSideSize, 2); i++) {//конвертирую в globalMap тайлы
@@ -247,7 +247,7 @@ void createChunk() {
 
         for (int mx = 0; mx < 64; mx++) {//создаём высотную карту, mx и my - координаты тайлов в чанке
             for (int my = 0; my < 64; my++) {
-                heightMap[mx + my * 64] += getNoiseValue(data->globalMap->viewedChunkX * step + mx * mStep, data->globalMap->viewedChunkY * step + my * mStep, stackGrid, l - 1) / pow(2, octave - 1);
+                heightMap[mx + my * 64] += getNoiseValue(data->globalMap->viewedChunkX * step + mx * mStep, data->globalMap->viewedChunkY * step + my * mStep, stackGrid, l) / pow(2, octave - 1);
             }
         }
 

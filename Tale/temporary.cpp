@@ -38,3 +38,6 @@ arr3d<Tile, 64, 64, 256>* generateOnHeightMap(int seed) {
 	delete(height);//почистить
 	return result;
 }
+/*
+
+*/
