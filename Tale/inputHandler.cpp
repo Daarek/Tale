@@ -2,7 +2,6 @@
 #include "enums.h"
 #include "localMap.h"
 #include "saveFileHandler.h"
-#include "temporary.h"
 #include "generators.h"
 #include "projectData.h"
 #include "generators.h"
@@ -20,26 +19,25 @@ void mouseInput(SDL_Event* event) {
 	int y = event->button.y;
 
 	//нажатие кнопки старт пускает сразу на экран игры, создаёт новый мир
+
 	switch (data->screen) {
 	case MAIN_MENU: {
-		if ((x > 0.45 * data->windowWidth) and (x < 0.55 * data->windowWidth) and (y > 0.45 * data->windowHeight) and (y < 0.55 * data->windowHeight)) {
-			data->globalMap->seed = generateSeed();
-			firstGeneratingSequence();
-			data->screen = GAME_SCREEN_GLOBAL_MAP;
+		if (data->menus.menus[MAIN_MENU].buttons["start"].isInbound(x, y)) {
+			data->menus.menus[MAIN_MENU].buttons["start"].action();
 		}
 		break;
 	}
 	case GAME_SCREEN_GLOBAL_MAP: {//перенести в генераторы позже
 		//если тык в пределах игрового экрана
-		if ((x > data->startOffsetX and x < (data->windowWidth - data->startOffsetX)) and (y > data->startOffsetY and y < (data->windowHeight - data->startOffsetY))) {
+		if (data->menus.menus[GAME_SCREEN_GLOBAL_MAP].buttons["map"].isInbound(x, y)) {
 			data->globalMap->viewedChunkX = (int)((x - data->startOffsetX) / data->side);
 			data->globalMap->viewedChunkY = (int)((y - data->startOffsetY) / data->side);//координаты кликнутого тайла
-			createChunk();
-			data->screen = GAME_SCREEN;
+			data->menus.menus[GAME_SCREEN_GLOBAL_MAP].buttons["map"].action();
 		}
 		break;
 	}
 	} 
+	
 }
 
 void keyboardInput(SDL_Event* event) {

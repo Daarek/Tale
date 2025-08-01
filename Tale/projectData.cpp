@@ -1,4 +1,5 @@
 #include "localMap.h"
+#include "menus.h"
 #include "enums.h"
 #include "SDL.h"
 
@@ -12,4 +13,5 @@ struct Data {
 	int startOffsetX; //координата X и Y самого левого верхнего угла самого верхнего левого тайла
 	int startOffsetY;
 	Screen screen;
+	Menus menus;//все меню.
 };

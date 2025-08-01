@@ -1,14 +1,6 @@
 #include "enums.h"
 #include "templates.h"
 #include <iostream>
-/*
-struct LocalMap { //карта 1 чанка
-	arr3d<Tile, 64, 64, 256>* tileMap; //собственно, сама карта, обращаться к нему как Z X Y, задавать как X Y Z (наверное)
-	//Tile* tileMap; 3d
-	int viewedZLevel;// z уровень камеры
-	int seed; //сид мира
-};
-*/
 struct GlobalMap {
 
 	arr3d<Tile, 64, 64, 256>* tileMap; //собственно, сама карта, обращаться к нему как Z X Y, задавать как X Y Z (наверное)

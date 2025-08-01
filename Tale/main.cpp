@@ -1,10 +1,10 @@
 #include "SDL.h"
+#include <string>
 #define	SDL_MAIN_USE_CALLBACKS
 #include "SDL3/SDL_main.h"
 #include "enums.h"
 #include "drawTools.h"
 #include "localMap.h"
-#include "temporary.h"
 #include <string>
 #include <iostream>
 #include "inputHandler.h"
@@ -14,6 +14,15 @@
 
 SDL_Window* window = NULL;
 static Data* data = new Data; //хранилище всей необходимой для работы информации
+
+void initButton(Screen scr, std::string name, int x, int y, int w, int h, voidFunction act) {
+	data->menus.menus[scr].buttons[name] = {};
+	data->menus.menus[scr].buttons[name].x = x;
+	data->menus.menus[scr].buttons[name].y = y;
+	data->menus.menus[scr].buttons[name].width = w;
+	data->menus.menus[scr].buttons[name].height = h;
+	data->menus.menus[scr].buttons[name].action = act;
+}
 
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv) {
 	data->globalMap = new GlobalMap;
@@ -28,6 +37,10 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv) {
 	data->startOffsetY = (int)((data->windowHeight - ((int)(data->windowHeight / data->scale) * data->scale)) / 2);
 	data->startOffsetX = (int)((data->windowWidth - ((int)(data->windowHeight / data->scale) * data->scale)) / 2);
 	data->screen = MAIN_MENU;
+	data->menus.menus[MAIN_MENU] = {}; //создаю меню главное меню
+	data->menus.menus[GAME_SCREEN_GLOBAL_MAP] = {};
+	initButton(MAIN_MENU, "start", (0.45 * data->windowWidth), (0.45 * data->windowHeight), (0.1 * data->windowWidth), (0.1 * data->windowHeight), []() {data->globalMap->seed = generateSeed(); firstGeneratingSequence(); data->screen = GAME_SCREEN_GLOBAL_MAP;});
+	initButton(GAME_SCREEN_GLOBAL_MAP, "map", data->startOffsetX, data->startOffsetY, (data->windowWidth - 2*data->startOffsetX), (data->windowHeight - 2*data->startOffsetY), [](){createChunk(); data->screen = GAME_SCREEN;});
 	arr3d<Tile, 64, 64, 256>* temp = new arr3d<Tile, 64, 64, 256>;
 	data->globalMap->tileMap = temp;
 	inputHandler_getData(data); //инициализация инпут функций

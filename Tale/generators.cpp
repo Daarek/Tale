@@ -7,7 +7,6 @@
 #include "localMap.h"
 #include "enums.h"
 #include "projectData.h"
-//using namespace std;
 static float M_PI = 3.14159265;
 static float rad = (M_PI / 180);
 
