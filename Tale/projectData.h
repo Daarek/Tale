@@ -14,5 +14,5 @@ struct Data {
 	int startOffsetX; //координата X и Y самого левого верхнего угла самого верхнего левого тайла
 	int startOffsetY;
 	Screen screen;
-	Menus menus;
+	Menus* menus;
 };

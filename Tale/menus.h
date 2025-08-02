@@ -1,5 +1,6 @@
 #pragma once
 #include <unordered_map>
+#include "SDL.h"
 #include <string>
 #include "enums.h"
 typedef void(*voidFunction)();
@@ -8,6 +9,7 @@ struct Button {
 	int y;
 	int width;
 	int height;
+	SDL_Texture* texture;
 	voidFunction action;
 	bool isInbound(int touchX, int touchY) {
 		if ((touchX >= x) and (touchY >= y) and (touchX <= (x + width)) and (touchY <= (y + height))) {

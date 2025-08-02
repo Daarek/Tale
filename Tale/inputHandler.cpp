@@ -22,17 +22,17 @@ void mouseInput(SDL_Event* event) {
 
 	switch (data->screen) {
 	case MAIN_MENU: {
-		if (data->menus.menus[MAIN_MENU].buttons["start"].isInbound(x, y)) {
-			data->menus.menus[MAIN_MENU].buttons["start"].action();
+		if (data->menus->menus[MAIN_MENU].buttons["start"].isInbound(x, y)) {
+			data->menus->menus[MAIN_MENU].buttons["start"].action();
 		}
 		break;
 	}
 	case GAME_SCREEN_GLOBAL_MAP: {//перенести в генераторы позже
 		//если тык в пределах игрового экрана
-		if (data->menus.menus[GAME_SCREEN_GLOBAL_MAP].buttons["map"].isInbound(x, y)) {
+		if (data->menus->menus[GAME_SCREEN_GLOBAL_MAP].buttons["map"].isInbound(x, y)) {
 			data->globalMap->viewedChunkX = (int)((x - data->startOffsetX) / data->side);
 			data->globalMap->viewedChunkY = (int)((y - data->startOffsetY) / data->side);//координаты кликнутого тайла
-			data->menus.menus[GAME_SCREEN_GLOBAL_MAP].buttons["map"].action();
+			data->menus->menus[GAME_SCREEN_GLOBAL_MAP].buttons["map"].action();
 		}
 		break;
 	}

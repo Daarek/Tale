@@ -1,4 +1,5 @@
 #include <unordered_map>
+#include "SDL.h"
 #include <string>
 #include "enums.h"
 typedef void(*voidFunction)();
@@ -7,6 +8,7 @@ struct Button {
 	int y;
 	int width; //ширина высота кнопки
 	int height;
+	SDL_Texture* texture;
 	voidFunction action; //что кнопка делает
 	bool isInbound(int touchX, int touchY) { //проверить, если клик на кнопке
 		if ((touchX >= x) and (touchY >= y) and (touchX <= (x + width)) and (touchY <= (y + height))) {
