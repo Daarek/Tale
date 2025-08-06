@@ -52,8 +52,8 @@ static void drawFog(int lvl, int x, int y) {
 }
 
 void drawMap() {
-	for (int x = 0; x < data->globalMap->globalMapSideSize; x++) {
-		for (int y = 0; y < data->globalMap->globalMapSideSize; y++) {
+	for (int x = data->zoomStartX; x < (data->scale + data->zoomStartX); x++) {
+		for (int y = data->zoomStartY; y < (data->scale + data->zoomStartY); y++) {
 			if (data->globalMap->globalMap[x + data->globalMap->globalMapSideSize * y] == LOWLANDS) {
 				drawFog(5, x, y);
 			}
@@ -69,16 +69,18 @@ void drawMap() {
 
 void drawFrame() { //потом всё перекопать, это тест, рисует GAME_SCREEN
 	int z = data->globalMap->viewedZLevel;
-	for (int x = 0; x < 64; x++) {
-		for (int y = 0; y < 64; y++) {
-			if ((*data->globalMap->tileMap)[z][x][y] != AIR) {//если на этом месте есть тайл, нарисовать его
-				drawTile((*data->globalMap->tileMap)[z][x][y], x, y);
+	for (int x = 0; x < data->scale; x++) {
+		for (int y = 0; y < data->scale; y++) {
+			int X = x + data->zoomStartX;
+			int Y = y + data->zoomStartY;
+			if ((*data->globalMap->tileMap)[z][X][Y] != AIR) {//если на этом месте есть тайл, нарисовать его
+				drawTile((*data->globalMap->tileMap)[z][X][Y], x, y);
 			}
 			else {
 				bool flag = true;//flag - есть ли блок ближе 5-ти тайлов вниз
 				for (int i = 1; i <= 5; i++) { //иначе рисовать туманы
-					if ((*data->globalMap->tileMap)[z - i][x][y] != AIR) {//если наткнулся на блок
-						drawTile((*data->globalMap->tileMap)[z - i][x][y], x, y);
+					if ((*data->globalMap->tileMap)[z - i][X][Y] != AIR) {//если наткнулся на блок
+						drawTile((*data->globalMap->tileMap)[z - i][X][Y], x, y);
 						drawFog(i, x, y);
 						flag = false;
 						break;
@@ -90,7 +92,7 @@ void drawFrame() { //потом всё перекопать, это тест, рисует GAME_SCREEN
 					drawFog(5, x, y);
 				}
 			}
-		}
+		}//!
 	}
 }
 

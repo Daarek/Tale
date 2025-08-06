@@ -12,6 +12,8 @@ struct Data {
 	int side;//длинна стороны тайла в пикселях
 	int startOffsetX; //координата X и Y самого левого верхнего угла самого верхнего левого тайла
 	int startOffsetY;
+	int zoomStartX;//x и y где начинается обзор камеры при зуме
+	int zoomStartY;
 	Screen screen;
 	Menus* menus;//все меню.
 };

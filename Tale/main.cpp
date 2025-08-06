@@ -11,6 +11,7 @@
 #include "generators.h"
 #include "saveFileHandler.h"
 #include "projectData.h"
+#include "actions.h"
 
 SDL_Window* window = NULL;
 static Data* data = new Data; //хранилище всей необходимой для работы информации
@@ -31,6 +32,8 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv) {
 	data->globalMap->initSize = 4;//грубо говоря, размер биомов (количество чанков шума)
 	data->globalMap->globalMapSideSize = 64;
 	data->scale = 64;
+	data->zoomStartX = 0;
+	data->zoomStartY = 0;
 	data->windowHeight = 1080;
 	data->windowWidth = 1920;
 	data->side = (int)(data->windowHeight / data->scale);
@@ -50,6 +53,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv) {
 	data->renderer = SDL_CreateRenderer(window, NULL);
 	drawTools_getData(data);
 	generators_getData(data);
+	actions_getData(data);
 	return SDL_APP_CONTINUE;
 };
 

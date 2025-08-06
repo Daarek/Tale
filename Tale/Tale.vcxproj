@@ -129,6 +129,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="actions.cpp" />
     <ClCompile Include="generators.cpp" />
     <ClCompile Include="inputHandler.cpp" />
     <ClCompile Include="localMap.cpp">
@@ -142,6 +143,7 @@
     <ClCompile Include="saveFileHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="actions.h" />
     <ClInclude Include="drawTools.h" />
     <ClInclude Include="enums.h" />
     <ClInclude Include="generators.h" />

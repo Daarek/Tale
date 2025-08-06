@@ -5,9 +5,11 @@
 #include "generators.h"
 #include "projectData.h"
 #include "generators.h"
+#include "actions.h"
 #include <iostream>
 
 static Data* data;
+static Tile hold = STONE;
 
 void inputHandler_getData(Data* d) {
 	data = d;
@@ -34,6 +36,12 @@ void mouseInput(SDL_Event* event) {
 			data->globalMap->viewedChunkY = (int)((y - data->startOffsetY) / data->side);//координаты кликнутого тайла
 			data->menus->menus[GAME_SCREEN_GLOBAL_MAP].buttons["map"].action();
 		}
+		break;
+	}
+	case GAME_SCREEN: {
+		int X = (int)((x - data->startOffsetX) / data->side);
+		int Y = (int)((y - data->startOffsetY) / data->side);
+		placeBlock(hold, X, Y, data->globalMap->viewedZLevel);
 		break;
 	}
 	} 
@@ -80,6 +88,54 @@ void keyboardInput(SDL_Event* event) {
 			if (data->globalMap->viewedChunkX < 63) {
 				data->globalMap->viewedChunkX++;
 				createChunk();
+			}
+		}
+		else if (key == SDLK_0) {//test
+			hold = AIR;
+		}
+		else if (key == SDLK_1) {
+			hold = GRASS;
+		}
+		else if (key == SDLK_2) {
+			hold = STONE;
+		}
+		else if (key == SDLK_W) {//камеру поднять
+			if (data->zoomStartY > 0) {
+				data->zoomStartY--;
+			}
+		}
+		else if (key == SDLK_A) {//камеру влево
+			if (data->zoomStartX > 0) {
+				data->zoomStartX--;
+			}
+		}
+		else if (key == SDLK_S) {//камеру вниз
+			if (data->zoomStartY < (64 - data->scale)) {
+				data->zoomStartY++;
+			}
+		}
+		else if (key == SDLK_D) {//камеру вправо
+			if (data->zoomStartX < (64 - data->scale)) {
+				data->zoomStartX++;
+			}
+		}
+		else if (key == SDLK_T) {//zoom in
+			if (data->scale > 1) {
+				data->scale--;
+				data->side = (int)(data->windowHeight / data->scale);
+			}
+		}
+		else if (key == SDLK_G) {//zoom out
+			if (data->scale < 64) {
+				data->scale++;
+				data->side = (int)(data->windowHeight / data->scale);
+
+				if (data->zoomStartX > 0) {//профилактика выхода за пределы массива
+					data->zoomStartX--;
+				}
+				if (data->zoomStartY > 0) {
+					data->zoomStartY--;
+				}
 			}
 		}
 		break;
