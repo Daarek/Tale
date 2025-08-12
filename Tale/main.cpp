@@ -31,20 +31,24 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char** argv) {
 	data->globalMap->octaveAmount = 4;//уровень детализации
 	data->globalMap->initSize = 4;//грубо говоря, размер биомов (количество чанков шума)
 	data->globalMap->globalMapSideSize = 64;
+	data->globalMap->regionalMapSideSize = 16;
 	data->scale = 64;
 	data->zoomStartX = 0;
 	data->zoomStartY = 0;
 	data->windowHeight = 1080;
 	data->windowWidth = 1920;
 	data->side = (int)(data->windowHeight / data->scale);
-	data->startOffsetY = (int)((data->windowHeight - ((int)(data->windowHeight / data->scale) * data->scale)) / 2);
-	data->startOffsetX = (int)((data->windowWidth - ((int)(data->windowHeight / data->scale) * data->scale)) / 2);
+	data->gameScreenWidth = data->side * data->scale;
+	data->startOffsetY = (int)((data->windowHeight - (data->gameScreenWidth)) / 2);
+	data->startOffsetX = (int)((data->windowWidth - (data->gameScreenWidth)) / 2);
 	data->screen = MAIN_MENU;
 	data->menus = new Menus;
 	data->menus->menus[MAIN_MENU] = {}; //создаю меню главное меню
 	data->menus->menus[GAME_SCREEN_GLOBAL_MAP] = {};
+	data->menus->menus[GAME_SCREEN_REGIONAL_MAP] = {};
 	initButton(MAIN_MENU, "start", (0.45 * data->windowWidth), (0.45 * data->windowHeight), (0.1 * data->windowWidth), (0.03 * data->windowWidth), []() {data->globalMap->seed = generateSeed(); firstGeneratingSequence(); data->screen = GAME_SCREEN_GLOBAL_MAP;});
-	initButton(GAME_SCREEN_GLOBAL_MAP, "map", data->startOffsetX, data->startOffsetY, (data->windowWidth - 2*data->startOffsetX), (data->windowHeight - 2*data->startOffsetY), [](){createChunk(); data->screen = GAME_SCREEN;});
+	initButton(GAME_SCREEN_GLOBAL_MAP, "map", data->startOffsetX, data->startOffsetY, (data->windowWidth - 2 * data->startOffsetX), (data->windowHeight - 2 * data->startOffsetY), []() {createRegionalChunk(); data->screen = GAME_SCREEN_REGIONAL_MAP; data->scale = data->globalMap->regionalMapSideSize; data->side = (int)(data->gameScreenWidth / data->scale);});
+	initButton(GAME_SCREEN_REGIONAL_MAP, "map", data->startOffsetX, data->startOffsetY, (data->windowWidth - 2 * data->startOffsetX), (data->windowHeight - 2 * data->startOffsetY), []() {createChunk(); data->screen = GAME_SCREEN; data->scale = 64; data->side = (int)(data->gameScreenWidth / data->scale); });
 	arr3d<Tile, 64, 64, 256>* temp = new arr3d<Tile, 64, 64, 256>;
 	data->globalMap->tileMap = temp;
 	inputHandler_getData(data); //инициализация инпут функций
@@ -70,6 +74,9 @@ SDL_AppResult SDL_AppIterate(void* appstate) {
 		break;
 	case GAME_SCREEN_GLOBAL_MAP:
 		drawMap();
+		break;
+	case GAME_SCREEN_REGIONAL_MAP:
+		drawRegionalMap();
 		break;
 	};
 	

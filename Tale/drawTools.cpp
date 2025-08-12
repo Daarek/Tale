@@ -52,12 +52,28 @@ static void drawFog(int lvl, int x, int y) {
 }
 
 void drawMap() {
-	for (int x = data->zoomStartX; x < (data->scale + data->zoomStartX); x++) {
+	for (int x = data->zoomStartX; x < (data->scale + data->zoomStartX); x++) {//подразумевается, что карту можно зумить
 		for (int y = data->zoomStartY; y < (data->scale + data->zoomStartY); y++) {
 			if (data->globalMap->globalMap[x + data->globalMap->globalMapSideSize * y] == LOWLANDS) {
 				drawFog(5, x, y);
 			}
 			else if (data->globalMap->globalMap[x + data->globalMap->globalMapSideSize * y] == MOUNTAINS) {
+				drawTile(STONE, x, y);
+			}
+			else {
+				drawTile(GRASS, x, y);
+			}
+		}
+	}
+}
+
+void drawRegionalMap() {
+	for (int x = 0; x < data->globalMap->regionalMapSideSize; x++) {//пока рег. карту зумить нельзя
+		for (int y = 0; y < data->globalMap->regionalMapSideSize; y++) {
+			if (data->globalMap->regionalMap[x + data->globalMap->regionalMapSideSize * y] == LOWLANDS) {
+				drawFog(5, x, y);
+			}
+			else if (data->globalMap->regionalMap[x + data->globalMap->regionalMapSideSize * y] == MOUNTAINS) {
 				drawTile(STONE, x, y);
 			}
 			else {

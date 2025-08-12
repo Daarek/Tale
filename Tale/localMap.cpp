@@ -6,11 +6,15 @@ struct GlobalMap {
 	arr3d<Tile, 64, 64, 256>* tileMap; //собственно, сама карта, обращаться к нему как Z X Y, задавать как X Y Z (наверное)
 
 	int globalMapSideSize; //how long is the side of global map (in chunks)
+	int regionalMapSideSize;//длинна региональной карты в чанках
 	GlobalTile* globalMap; //1d глобальная карта (квадрат)
+	GlobalTile* regionalMap; ////1d региональная карта
 
 	int viewedZLevel;// z уровень камеры
 	int viewedChunkX;
-	int viewedChunkY;//x и y просматриваемого чанка
+	int viewedChunkY;//x и y просматриваемого глобального чанка
+	int viewedRegChunkX;
+	int viewedRegChunkY;//x и y просматриваемого регионального чанка
 	int seed;
 	float* perlinGrid; //1d perlin grid
 	int octaveAmount; //amount of perlin octaves

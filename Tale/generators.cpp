@@ -152,13 +152,14 @@ void firstGeneratingSequence() {
         int l = (int)(pow(2, octave - 1) * data->globalMap->initSize + 1);//длинна стороны одной октавы
         float* stackGrid = new float[(int)(pow(l, 2))]; //текущая октава
         for (int i = 0; i < (int)(pow(l, 2)); i++) {//копируем октаву
-            stackGrid[i] = data->globalMap->perlinGrid[data->globalMap->getOctaveOffset(octave - 1) + i]; //Вызвано исключение по адресу 0x00007FF6E1FE62D4 в Tale.exe: 0xC0000005: нарушение прав доступа при чтении по адресу 0x000001FD3BDCF000.
+            stackGrid[i] = data->globalMap->perlinGrid[data->globalMap->getOctaveOffset(octave - 1) + i];
         }
 
         float step = data->globalMap->initSize * pow(2, octave - 1) / data->globalMap->globalMapSideSize; //скольки координатам на октаве соответствует координата на arr2d
+        float mStep = step * 0.5;
         for (int x = 0; x < data->globalMap->globalMapSideSize; x++) {//создаём высотную карту
             for (int y = 0; y < data->globalMap->globalMapSideSize; y++) {
-                heightMap[x + y * data->globalMap->globalMapSideSize] += getNoiseValue(x * step, y * step, stackGrid, l) / pow(2, octave - 1);; /*getNoiseValue(x * step, y * step, stackGrid, l) / pow(2, octave - 1);*/
+                heightMap[x + y * data->globalMap->globalMapSideSize] += getNoiseValue(x * step + mStep, y * step + mStep, stackGrid, l) / pow(2, octave - 1);
             }
         }
 
@@ -185,42 +186,6 @@ void firstGeneratingSequence() {
     
 }
 
-arr2d<float, 256, 256>* createHeightMap(int order, int startScale, int seed) {//order - количество октав, startScale - колво кубиков на первой октаве
-    if ((startScale * pow(2, order)) > 256) { //вернёт ничего если одна из октав шума будет детализированее всей карты
-        std::cout << "error";
-        return nullptr;
-    }
-    int t = 0;
-    for (int i = 0; i < order; i++) {
-        t = t + pow(2, i);
-    }
-    int low = (t / pow(2, (order - 1))); //число, на которое стоит поделить все высоты после создания полной сетки со всеми слоями
-    arr2d<float, 256, 256>* heightMap = new arr2d<float, 256, 256>{}; //указатель на карту высот
-
-    for (int i = 1; i <= order; i++) { //создавать карту по октаве
-
-        float* stack_grid = createGrid(seed, pow(startScale, i));//текущая октава
-        float step = pow(startScale, i) / 256; //скольки координатам на октаве соответствует координата на arr2d
-
-        for (int x = 0; x < 256; x++) {
-            for (int y = 0; y < 256; y++) {
-                (*heightMap)[x][y] += (getNoiseValue(x * step, y * step, stack_grid, pow(startScale, i)) /pow(2, i - 1)); //ищем значения по 1
-            }
-         }
-
-        delete[](stack_grid);//почистить память
-    }
-    
-    for (int x = 0; x < 256; x++) { // сжать
-        for (int y = 0; y < 256; y++) {
-            (*heightMap)[x][y] /= low;
-        }
-    }
-    
-    return heightMap;
-
-}
-
 void createChunk() {
     int t = 0;
     for (int i = 0; i < data->globalMap->octaveAmount; i++) {
@@ -242,16 +207,17 @@ void createChunk() {
         }
 
         float step = data->globalMap->initSize * pow(2, octave - 1) / data->globalMap->globalMapSideSize; //скольки координатам на октаве соответствует координата на arr2d
-        float mStep = step / 64; ////скольки координатам на октаве соответствует координата на чанке
-
+        float mStep = step / data->globalMap->regionalMapSideSize; ////скольки координатам на октаве соответствует координата на рег чанке
+        float mmStep = mStep / 64; //скольки координатам на октаве соответствует координата на чанке
         for (int mx = 0; mx < 64; mx++) {//создаём высотную карту, mx и my - координаты тайлов в чанке
             for (int my = 0; my < 64; my++) {
-                heightMap[mx + my * 64] += getNoiseValue(data->globalMap->viewedChunkX * step + mx * mStep, data->globalMap->viewedChunkY * step + my * mStep, stackGrid, l) / pow(2, octave - 1);
+                heightMap[mx + my * 64] += getNoiseValue(data->globalMap->viewedChunkX * step + data->globalMap->viewedRegChunkX * mStep + mx * mmStep, data->globalMap->viewedChunkY * step + data->globalMap->viewedRegChunkY * mStep + my * mmStep, stackGrid, l) / pow(2, octave - 1);
             }
-        }
+        }//цикл сверху - единственное что поменяется (наверное)
 
         delete[](stackGrid);
     }
+
     for (int i = 0; i < (int)pow(data->globalMap->globalMapSideSize, 2); i++) {//конвертирую в высоты в кубах
         heightMap[i] = (int)(heightMap[i] / low * 49 + 128);
 
@@ -273,4 +239,64 @@ void createChunk() {
         }
     }
     delete[](heightMap);
+}
+
+
+void createRegionalChunk() {
+    int t = 0;
+    for (int i = 0; i < data->globalMap->octaveAmount; i++) {
+        t = t + pow(2, i);
+    }
+    int low = (t / pow(2, (data->globalMap->octaveAmount - 1))); //число, на которое стоит поделить все высоты после создания полной сетки со всеми слоями
+
+    float* heightMap = new float[(int)pow(data->globalMap->regionalMapSideSize, 2)];//карта высот для 1 рег. чанка
+    for (int i = 0; i < (int)pow(data->globalMap->regionalMapSideSize, 2); i++) {//зануляю
+        heightMap[i] = 0.0f;
+    }
+
+    for (int octave = 1; octave <= data->globalMap->octaveAmount; octave++) { //создавать карту по октаве
+
+        int l = (int)(pow(2, octave - 1) * data->globalMap->initSize + 1);//длинна стороны одной октавы
+        float* stackGrid = new float[(int)(pow(l, 2))]; //текущая октава
+        for (int i = 0; i < (int)(pow(l, 2)); i++) {//копируем октаву
+            stackGrid[i] = data->globalMap->perlinGrid[data->globalMap->getOctaveOffset(octave - 1) + i];
+        }
+
+        float step = data->globalMap->initSize * pow(2, octave - 1) / data->globalMap->globalMapSideSize; //скольки координатам на октаве соответствует координата на arr2d
+        float mStep = step / data->globalMap->regionalMapSideSize; ////скольки координатам на октаве соответствует координата на чанке
+        //float mmStep = mStep / 16; //скольки координатам на октаве соответствует координата на субчанке
+        for (int mx = 0; mx < data->globalMap->regionalMapSideSize; mx++) {//создаём высотную карту, mx и my - координаты тайлов в чанке
+            for (int my = 0; my < data->globalMap->regionalMapSideSize; my++) {
+                heightMap[mx + my * data->globalMap->regionalMapSideSize] += getNoiseValue(data->globalMap->viewedChunkX * step + mx * mStep, data->globalMap->viewedChunkY * step + my * mStep, stackGrid, l) / pow(2, octave - 1);
+            }
+        }//цикл сверху - единственное что поменяется (наверное)
+
+        delete[](stackGrid);
+    }
+
+    for (int i = 0; i < (int)pow(data->globalMap->regionalMapSideSize, 2); i++) {//конвертирую в высоты в кубы
+        heightMap[i] = (int)(heightMap[i] / low * 49 + 128);
+
+    }
+
+    GlobalTile* regionalMapArray = new GlobalTile[(int)pow(data->globalMap->regionalMapSideSize, 2)];//собираю карту
+    for (int x = 0; x < data->globalMap->regionalMapSideSize; x++) {
+        for (int y = 0; y < data->globalMap->regionalMapSideSize; y++) {
+            if (heightMap[x + data->globalMap->regionalMapSideSize * y] >= 138) {
+                regionalMapArray[x + data->globalMap->regionalMapSideSize * y] = MOUNTAINS;
+            }
+            else if (heightMap[x + data->globalMap->regionalMapSideSize * y] <= 118) {
+                regionalMapArray[x + data->globalMap->regionalMapSideSize * y] = LOWLANDS;
+            }
+            else {
+                regionalMapArray[x + data->globalMap->regionalMapSideSize * y] = PLAINS;
+            }
+        }
+    }
+    data->globalMap->regionalMap = regionalMapArray;
+    delete[](heightMap);
+}
+
+void createSubChunk() {
+
 }

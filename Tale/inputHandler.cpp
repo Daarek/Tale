@@ -34,6 +34,8 @@ void mouseInput(SDL_Event* event) {
 		if (data->menus->menus[GAME_SCREEN_GLOBAL_MAP].buttons["map"].isInbound(x, y)) {
 			data->globalMap->viewedChunkX = (int)((x - data->startOffsetX) / data->side);
 			data->globalMap->viewedChunkY = (int)((y - data->startOffsetY) / data->side);//координаты кликнутого тайла
+			data->globalMap->viewedChunkX -= (data->globalMap->viewedChunkX == data->globalMap->globalMapSideSize);//профилактика бага
+			data->globalMap->viewedChunkY -= (data->globalMap->viewedChunkY == data->globalMap->globalMapSideSize);
 			data->menus->menus[GAME_SCREEN_GLOBAL_MAP].buttons["map"].action();
 		}
 		break;
@@ -41,7 +43,19 @@ void mouseInput(SDL_Event* event) {
 	case GAME_SCREEN: {
 		int X = (int)((x - data->startOffsetX) / data->side);
 		int Y = (int)((y - data->startOffsetY) / data->side);
+		X -= (X == 64);//профилактика бага
+		Y -= (Y == 64);
 		placeBlock(hold, X, Y, data->globalMap->viewedZLevel);
+		break;
+	}
+	case GAME_SCREEN_REGIONAL_MAP: {
+		if (data->menus->menus[GAME_SCREEN_REGIONAL_MAP].buttons["map"].isInbound(x, y)) {
+			data->globalMap->viewedRegChunkX = (int)((x - data->startOffsetX) / data->side);
+			data->globalMap->viewedRegChunkY = (int)((y - data->startOffsetY) / data->side);//координаты кликнутого тайла
+			data->globalMap->viewedRegChunkX -= (data->globalMap->viewedRegChunkX == data->globalMap->regionalMapSideSize);//профилактика бага
+			data->globalMap->viewedRegChunkY -= (data->globalMap->viewedRegChunkY == data->globalMap->regionalMapSideSize);
+			data->menus->menus[GAME_SCREEN_REGIONAL_MAP].buttons["map"].action();
+		}
 		break;
 	}
 	} 
@@ -49,10 +63,11 @@ void mouseInput(SDL_Event* event) {
 }
 
 void keyboardInput(SDL_Event* event) {
+	SDL_Keycode key = event->key.key;
 	switch (data->screen) {
 
 	case GAME_SCREEN: {
-		SDL_Keycode key = event->key.key;
+		
 		if (key == SDLK_R) { //посмотреть на уровень вверх
 			if (data->globalMap->viewedZLevel < 256) {
 				data->globalMap->viewedZLevel++;
@@ -64,29 +79,31 @@ void keyboardInput(SDL_Event* event) {
 			}
 		}
 		else if (key == SDLK_M) {//открыть глобальную карту
-			data->screen = GAME_SCREEN_GLOBAL_MAP;
+			data->screen = GAME_SCREEN_REGIONAL_MAP;
+			data->scale = data->globalMap->regionalMapSideSize;
+			data->side = (int)(data->gameScreenWidth / data->scale);
 		}
 		else if (key == SDLK_UP) {//открыть чанк сверху
-			if (data->globalMap->viewedChunkY > 0) {
-				data->globalMap->viewedChunkY--;
+			if (data->globalMap->viewedRegChunkY > 0) {
+				data->globalMap->viewedRegChunkY--;
 				createChunk();
 			}
 		}
 		else if (key == SDLK_DOWN) {//открыть чанк сверху
-			if (data->globalMap->viewedChunkY <63) {
-				data->globalMap->viewedChunkY++;
+			if (data->globalMap->viewedRegChunkY < data->globalMap->regionalMapSideSize-1) {
+				data->globalMap->viewedRegChunkY++;
 				createChunk();
 			}
 		}
 		else if (key == SDLK_LEFT) {//открыть чанк сверху
-			if (data->globalMap->viewedChunkX > 0) {
-				data->globalMap->viewedChunkX--;
+			if (data->globalMap->viewedRegChunkX > 0) {
+				data->globalMap->viewedRegChunkX--;
 				createChunk();
 			}
 		}
 		else if (key == SDLK_RIGHT) {//открыть чанк сверху
-			if (data->globalMap->viewedChunkX < 63) {
-				data->globalMap->viewedChunkX++;
+			if (data->globalMap->viewedRegChunkX < data->globalMap->regionalMapSideSize-1) {
+				data->globalMap->viewedRegChunkX++;
 				createChunk();
 			}
 		}
@@ -122,13 +139,13 @@ void keyboardInput(SDL_Event* event) {
 		else if (key == SDLK_T) {//zoom in
 			if (data->scale > 1) {
 				data->scale--;
-				data->side = (int)(data->windowHeight / data->scale);
+				data->side = (int)(data->gameScreenWidth / data->scale);
 			}
 		}
 		else if (key == SDLK_G) {//zoom out
 			if (data->scale < 64) {
 				data->scale++;
-				data->side = (int)(data->windowHeight / data->scale);
+				data->side = (int)(data->gameScreenWidth / data->scale);
 
 				if (data->zoomStartX > 0) {//профилактика выхода за пределы массива
 					data->zoomStartX--;
@@ -142,13 +159,44 @@ void keyboardInput(SDL_Event* event) {
 	}
 
 	case MAIN_MENU: {
-		SDL_Keycode key = event->key.key;
 		if (key == SDLK_L) { //Загрузить
 			data->globalMap->seed = load();
 			firstGeneratingSequence();
 			data->screen = GAME_SCREEN_GLOBAL_MAP;
 		}
 		break;
+	}
+
+	case GAME_SCREEN_REGIONAL_MAP: {
+		if (key == SDLK_UP) {//открыть чанк сверху
+			if (data->globalMap->viewedChunkY > 0) {
+				data->globalMap->viewedChunkY--;
+				createRegionalChunk();
+			}
+		}
+		else if (key == SDLK_DOWN) {//открыть чанк снизу
+			if (data->globalMap->viewedChunkY < data->globalMap->globalMapSideSize - 1) {
+				data->globalMap->viewedChunkY++;
+				createRegionalChunk();
+			}
+		}
+		else if (key == SDLK_LEFT) {//открыть чанк cлева
+			if (data->globalMap->viewedChunkX > 0) {
+				data->globalMap->viewedChunkX--;
+				createRegionalChunk();
+			}
+		}
+		else if (key == SDLK_RIGHT) {//открыть чанк справа
+			if (data->globalMap->viewedChunkX < data->globalMap->globalMapSideSize - 1) {
+				data->globalMap->viewedChunkX++;
+				createRegionalChunk();
+			}
+		}
+		else if (key == SDLK_M) {//открыть глобальную карту
+			data->screen = GAME_SCREEN_GLOBAL_MAP;
+			data->scale = data->globalMap->globalMapSideSize;
+			data->side = (int)(data->gameScreenWidth / data->scale);
+		}
 	}
 
 

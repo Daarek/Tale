@@ -9,7 +9,8 @@ enum Tile {
 enum Screen {
 	MAIN_MENU,
 	GAME_SCREEN,
-	GAME_SCREEN_GLOBAL_MAP
+	GAME_SCREEN_GLOBAL_MAP,
+	GAME_SCREEN_REGIONAL_MAP
 };
 
 enum GlobalTile {

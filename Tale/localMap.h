@@ -2,21 +2,18 @@
 #include "templates.h"
 #include "enums.h"
 #include <iostream>
-/*
-struct LocalMap {
-	arr3d<Tile, 64, 64, 256>* tileMap;
-	//Tile* tileMap;
-	int viewedZLevel;
-	int seed;
-};
-*/
+
 struct GlobalMap {
 	arr3d<Tile, 64, 64, 256>* tileMap;
 	int globalMapSideSize;
+	int regionalMapSideSize;
 	GlobalTile* globalMap;
+	GlobalTile* regionalMap;
 	int viewedZLevel;
 	int viewedChunkX;
 	int viewedChunkY;
+	int viewedRegChunkX;
+	int viewedRegChunkY;
 	int seed;
 	float* perlinGrid;
 	int octaveAmount;

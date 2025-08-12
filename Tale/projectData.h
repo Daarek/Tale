@@ -9,6 +9,7 @@ struct Data {
 	SDL_Renderer* renderer;
 	int windowWidth; //ширина и высота монитара
 	int windowHeight;
+	int gameScreenWidth;
 	int scale; //сколько тайлов должно помещаться на экране
 	int side;
 	int startOffsetX; //координата X и Y самого левого верхнего угла самого верхнего левого тайла

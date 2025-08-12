@@ -11,3 +11,4 @@ void drawTile(Tile tile, int x, int y);
 void drawFrame();
 void drawMainMenu();
 void drawMap();
+void drawRegionalMap();
